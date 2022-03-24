@@ -1,11 +1,11 @@
-name: emuBOOB
-version: "0.1.0"
+name: ZAS
+version: "0.2.3"
 author: MrZloHex <zlo.alex.it@gmail.com>
-about: Compiler fof Assembler of ZP08
+about: Compiler of Assembler of ZPU80
 subcommands:
     - build:
         about: Produce binary file ready for uploading into ROM or into emulator
-        version: "0.1"
+        version: "0.2"
         author: MrZloHex <zlo.alex.it@gmail.com>
         args:
             - input:
