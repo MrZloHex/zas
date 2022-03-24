@@ -41,7 +41,9 @@ impl Compiler {
 
             let is_label = if tokens[0].ends_with(':') {
                 tokens[0].pop();
-                if tokens[0].chars().next().unwrap().is_numeric() {
+                let first_char = tokens[0].chars().next().unwrap();
+                if first_char.is_numeric() || first_char == '.' {
+                    // TODO: formatted error message
                     eprintln!("ERROR: labels can't starts with NUMBER");
                     std::process::exit(1);
                 }
@@ -112,7 +114,28 @@ impl Compiler {
                         };
                         self.binary.push(imm);
                     } else {
-                        
+                        if imm_str.contains('%') {
+                            let label_toks: Vec<&str> = imm_str.split('%').collect();
+                            if label_toks[1].is_empty() {
+                                // TODO: normal error message - formatted
+                                eprintln!("ERROR: not specifed SIGNIFICANCE of address");
+                                std::process::exit(1);
+                            }
+                            match label_toks[1] {
+                                "H" => (),
+                                "L" => (),
+                                _ => {
+                                    // TODO: normal error message - formatted
+                                    eprintln!("ERROR: undefined SIGNIFICANCE of address");
+                                    std::process::exit(1);
+                                }
+                            }
+                        } else {
+                            // FOR FUTURE for simple LABELS and maybe SOME DATA
+                            // TODO: normal error message - formatted
+                            eprintln!("ERROR: not specifed SIGNIFICANCE of address");
+                            std::process::exit(1);
+                        }
                     }
                 },
                 None => self.binary.push(op)
