@@ -1,1 +1,0 @@
-/home/zs/Projects/ZCS-8/zas/target/debug/zas: /home/zs/Projects/ZCS-8/zas/src/cli.yaml /home/zs/Projects/ZCS-8/zas/src/compiler.rs /home/zs/Projects/ZCS-8/zas/src/dictionary.rs /home/zs/Projects/ZCS-8/zas/src/file.rs /home/zs/Projects/ZCS-8/zas/src/main.rs
