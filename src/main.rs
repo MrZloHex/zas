@@ -21,7 +21,7 @@ fn main() {
         let mut compiler = Compiler::new(read_file(input_fname));
         compiler.compile(true);
         if verbosity { println!("{}: Finishing compiling", "INFO".cyan()) }
-        write_file_bin(output_fname, compiler.get_binary());
+//        write_file_bin(output_fname, compiler.get_binary());
         if verbosity { bin_dump(compiler.get_binary()) }
     } else {
         eprintln!("{}: wasn't provided {}\nFor help run `{}`", "ERROR".bright_red(), "SUBCOMMAND".cyan(), "zas --help".green());
