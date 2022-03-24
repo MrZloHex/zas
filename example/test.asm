@@ -9,5 +9,7 @@ jump:	MIH label%H
 	MIL label%L
 	; COMMENT
 	JMP
+	MIH jump%H
+	MIL jump%L
 	HLT
 

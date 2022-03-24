@@ -121,15 +121,36 @@ impl Compiler {
                                 eprintln!("ERROR: not specifed SIGNIFICANCE of address");
                                 std::process::exit(1);
                             }
-                            match label_toks[1] {
-                                "H" => (),
-                                "L" => (),
+                            let imm = match label_toks[1] {
+                                "H" => {
+                                    let address = match self.labels.get(label_toks[0]) {
+                                        Some(&add) => add,
+                                        None => {
+                                            // TODO: formatted message
+                                            eprintln!("ERROR: no such label {} at line {}", label_toks[0], self.line);
+                                            std::process::exit(1);
+                                        }
+                                    };
+                                    (address >> 8) as u8
+                                },
+                                "L" => {
+                                    let address = match self.labels.get(label_toks[0]) {
+                                        Some(&add) => add,
+                                        None => {
+                                            // TODO: formatted message
+                                            eprintln!("ERROR: no such label {} at line {}", label_toks[0], self.line);
+                                            std::process::exit(1);
+                                        }
+                                    };
+                                    address as u8
+                                },
                                 _ => {
                                     // TODO: normal error message - formatted
                                     eprintln!("ERROR: undefined SIGNIFICANCE of address");
                                     std::process::exit(1);
                                 }
-                            }
+                            };
+                            self.binary.push(imm);
                         } else {
                             // FOR FUTURE for simple LABELS and maybe SOME DATA
                             // TODO: normal error message - formatted
