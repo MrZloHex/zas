@@ -1,0 +1,19 @@
+	MIH 0x80
+	MIL 0x10
+	MIA 8
+	MIB 4
+	MID 1
+	MIE 1
+	MAC
+	LSP
+loop:	ADC
+	PUA
+	MEA
+	ADD
+	CPB
+	MAE
+	POA
+	MIH loop%H
+	MIL loop%L
+	JRZ
+	HLT
