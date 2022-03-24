@@ -54,6 +54,7 @@ impl Compiler {
                 false
             };
 
+            // TODO: MAKE PRETTY AND OPTIMISE
             let (instr, op_data, sec_byte_str) = if is_label {
                 print!("INSTR: {}", tokens[1]);
                 let (op_data, byte) = self.dict.get_opcode(tokens[1].as_str());
@@ -96,13 +97,12 @@ impl Compiler {
                             let oct_val = imm_str.strip_prefix("0o").unwrap();
                             (8, oct_val, "OCT".to_string())
                         } else {
-                            let dec_val = match imm_str.strip_prefix("0x") {
+                            let dec_val = match imm_str.strip_prefix("0d") {
                                 Some(val) => val,
                                 None => imm_str.as_str()
                             };
                             (10, dec_val, "DEC".to_string())
                         };
-
                         let imm: u8 = match u8::from_str_radix(val_str, radix) {
                             Ok(val) => val,
                             Err(_) => {

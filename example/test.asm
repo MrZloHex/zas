@@ -5,8 +5,8 @@ label:	MIH 80
 	LSP
 
 	ADB
-	MIH label%H
-jump:	MIL label%L
+jump:	MIH label%H
+	MIL label%L
 	; COMMENT
 	JMP
 	HLT
