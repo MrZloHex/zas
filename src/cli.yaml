@@ -1,0 +1,31 @@
+name: emuBOOB
+version: "0.1.0"
+author: MrZloHex <zlo.alex.it@gmail.com>
+about: Compiler fof Assembler of ZP08
+subcommands:
+    - build:
+        about: Produce binary file ready for uploading into ROM or into emulator
+        version: "0.1"
+        author: MrZloHex <zlo.alex.it@gmail.com>
+        args:
+            - input:
+                short: i
+                long: input
+                help: Input filename with assembly code
+                required: true
+                takes_value: true
+                value_name: INPUT_FILE
+            - output:
+                short: o
+                long: output
+                help: Output filename with binary
+                required: true
+                takes_value: true
+                value_name: OUTPUT_FILE
+            - verbose:
+                short: v
+                long: verbose
+                help: Displaying input assembly code and ouput binary code
+                required: false
+                takes_value: false
+
