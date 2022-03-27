@@ -51,9 +51,11 @@ impl Compiler {
                         std::process::exit(1);
                     }
                     if verbosity {
-                        println!("GOT A LABEL `{}` at address {}", tokens[0], self.binary.len())
+                        println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
                     }
-                    self.labels.insert(tokens[0].clone(), self.label_address);
+                    if cycle == 0 {
+                        self.labels.insert(tokens[0].clone(), self.label_address);
+                    }
                     true
                 } else {
                     false
