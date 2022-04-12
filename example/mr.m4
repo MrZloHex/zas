@@ -1,2 +1,2 @@
-m4_changequote(``{'', ``}'')m4_dnl
-define(`EQU', `m4_define({')dnl
+m4_dnl m4_changequote(``{'', ``}'')
+define(`MACRO', `str1str2')dnl
