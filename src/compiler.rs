@@ -28,7 +28,6 @@ impl Compiler {
         if verbosity { println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
     
         for cycle in 0..2 {
-            println!("{}", cycle);
             while self.line < self.data.len() {
                 let mut line = self.data[self.line].clone();
                 self.line += 1;
@@ -41,7 +40,7 @@ impl Compiler {
 
                 if tokens.is_empty() { continue; }
 
-                if tokens[0].starts_with(';') { continue; }
+                if tokens[0].starts_with(';') || tokens[0].starts_with('.') { continue; }
 
                 let is_label = if tokens[0].ends_with(':') {
                     tokens[0].pop();
@@ -51,7 +50,7 @@ impl Compiler {
                         std::process::exit(1);
                     }
                     if verbosity {
-                        println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
+                        // println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
                     }
                     if cycle == 0 {
                         self.labels.insert(tokens[0].clone(), self.label_address);
@@ -63,7 +62,7 @@ impl Compiler {
 
                 // TODO: MAKE PRETIFY AND OPTIMISE
                 let (instr, op_data, sec_byte_str) = if is_label {
-                    print!("INSTR: {}", tokens[1]);
+                    // print!("INSTR: {}", tokens[1]);
                     let (op_data, byte) = self.dict.get_opcode(tokens[1].as_str());
                     if byte {
                         (tokens[1].clone(), op_data, Some(tokens[2].clone()))
@@ -71,7 +70,7 @@ impl Compiler {
                         (tokens[1].clone(), op_data, None)
                     }
                 } else {
-                    print!("INSTR: {}", tokens[0]);
+                    // print!("INSTR: {}", tokens[0]);s
                     let (op_data, byte) = self.dict.get_opcode(tokens[0].as_str());
                     if byte {
                         (tokens[0].clone(), op_data, Some(tokens[1].clone()))
@@ -80,7 +79,7 @@ impl Compiler {
                     }
                 };
 
-                println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
+                // println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
 
                 let op = match op_data {
                     Some(op) => *op,
@@ -190,7 +189,7 @@ impl Compiler {
     }
 }
 
-fn correct_first_char(ch: char) -> bool {
+fn _correct_first_char(ch: char) -> bool {
     match ch {
         ';' => true,
         'A'..='Z' => true,

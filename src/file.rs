@@ -21,6 +21,25 @@ pub fn read_file(filename: String) -> Vec<String> {
     data
 }
 
+pub fn write_file(filename: String, data: Vec<String>) {
+    let mut file = match File::create(filename.clone()) {
+        Ok(f) => f,
+        Err(why) => {
+            eprintln!("{}: couldn't create file {} cause {}", "ERROR".bright_red(), filename.italic().bold(), why);
+            std::process::exit(1);
+        }
+    };
+    let mut val = Vec::new();
+    for line in data {
+        for byte in line.as_bytes() {
+            val.push(*byte);
+        }
+        val.push('\n' as u8);
+    }
+    file.write_all(&val);
+}
+
+
 pub fn write_file_bin(filename: String, data: Vec<u8>) {
     let mut file = match File::create(filename.clone()) {
         Ok(f) => f,

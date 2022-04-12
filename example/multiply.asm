@@ -1,7 +1,10 @@
+.DEF	A 0d17
+.DEF	B 0d13
+
 	MIH 0x80
 	MIL 0x10
-	MIA 8
-	MIB 4
+	MIA A
+	MIB B
 	MID 1
 	MIE 1
 	MAC

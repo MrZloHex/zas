@@ -6,6 +6,8 @@ mod file;
 use file::{read_file, write_file_bin};
 mod compiler;
 use compiler::Compiler;
+mod preproc;
+use preproc::PreProcessor;
 
 fn main() {
     let yaml = load_yaml!("cli.yaml");
@@ -16,11 +18,16 @@ fn main() {
         let output_fname = matches.value_of("output").unwrap().to_string();
         let verbosity = matches.is_present("verbose");
 
-        if verbosity { println!("{}: Starting compiling", "INFO".cyan()) }
+        let mut preproc = PreProcessor::new(read_file(input_fname.clone()), "macro_rules.m4".to_string());
+        let code = preproc.preprocess(input_fname.clone());
 
-        let mut compiler = Compiler::new(read_file(input_fname));
+        if verbosity { println!("{}: Starting compiling", "INFO".cyan()) }
+        
+        let mut compiler = Compiler::new(code);
         compiler.compile(true);
+
         if verbosity { println!("{}: Finishing compiling", "INFO".cyan()) }
+        
         write_file_bin(output_fname, compiler.get_binary());
         if verbosity { bin_dump(compiler.get_binary()) }
     } else {

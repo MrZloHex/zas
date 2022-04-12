@@ -1,7 +1,6 @@
-.DEF	MACRO HLT
-.DEF	my_var 0x80
+.EQU qwe 100
 
-	MIH my_var
+	MIH 80
 	MIL 0xFF
 	MIH jump%H
 	MIL jump%L
@@ -14,4 +13,4 @@ jump:	MIH label%H
 	MIL label%L
 	; COMMENT
 	JMP
-	MACRO
+	HLT
