@@ -1,13 +1,21 @@
-.DEF	MACRO HLT
 .DEF	my_var 0x80
+.DEF	MACRO HLT
 
-	MIH my_var
+
+SECTION TEXT
+
+	MAC my_var
 	MIL 0xFF
 	MIH jump%H
 	MIL jump%L
 label:	MIA 0o32
 	MIB 0b110
 	LSP
+	MACRO
+END
+
+
+SECTION TEXT
 
 	ADB
 jump:	MIH label%H
@@ -15,3 +23,5 @@ jump:	MIH label%H
 	; COMMENT
 	JMP
 	MACRO
+
+END

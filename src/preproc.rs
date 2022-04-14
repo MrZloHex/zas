@@ -10,6 +10,15 @@ struct Macro {
     pub value: String
 }
 
+impl Macro {
+    pub fn new() -> Macro {
+        Macro { name: String::new(), value: String::new() }
+    }
+
+    pub fn make(name: String, value: String) -> Macro {
+        Macro { name, value }
+    }
+}
 
 pub struct PreProcessor {
     data: Vec<String>,
@@ -43,6 +52,10 @@ impl PreProcessor {
         }
 
         let output = String::from_utf8(preproc.stdout).unwrap();
+        println!("Preproc output:\n{}\nEND", output);
+
+        // REMOVE M4 RULES FILE
+
         let _ = Command::new("rm")
                                 .arg(self.mrfname.clone())
                                 .output()
@@ -53,19 +66,66 @@ impl PreProcessor {
 
     fn parse_macros(&mut self) {
         let mut index: usize = 0;
+
+        let mut is_long_macro = false;
+        let mut first_macro_line = true;
+        let mut long_macro = Macro::new();
+
+        let mut is_section = false;
+
         while index < self.data.len() {
             let mut line = self.data[index].clone();
             index += 1;
 
-            if !line.starts_with('.') { continue; }
+            if line.starts_with("SECTION") {
+                is_section = true;
+            } else if line.starts_with("END") {
+                is_section = false;
+            }
 
-            line = line.replace("\t", " ");
+            if !line.starts_with('.') && !is_long_macro || is_section { continue; }
+
+            if !is_long_macro {
+                line = line.replace("\t", " ");
+            }
+            
             let tokens: Vec<String> = line.split_whitespace().map(|s| s.to_string()).collect();
+
             if tokens[0] == ".DEF" {
-                self.macro_rules.push(Macro { name: tokens[1].clone(), value: tokens[2].clone() });
+                if tokens.len() > 2 {
+                    if tokens[2].is_empty() {
+                        eprintln!("{}: value of macro {} is {}", "ERROR".bright_red(), tokens[1].italic(), "NULL".bold());
+                        std::process::exit(1);
+                    }
+                    self.macro_rules.push(Macro::make(tokens[1].clone(), tokens[2].clone()));
+                } else if tokens.len() == 2 {
+
+                    is_long_macro = true;
+                    long_macro.name = tokens[1].clone();
+                } else {
+                    eprintln!("{}: not defined macro name", "ERROR".bright_red());
+                    std::process::exit(1);
+                }
+            } else if tokens[0] == ".ENDDEF" {
+                is_long_macro = false;
+                long_macro.value.pop();
+                self.macro_rules.push(long_macro);
+                long_macro = Macro::new();
+                first_macro_line = true;
             } else {
-                eprintln!("{}: unknown preprocessot derictive: {}", "ERROR".bright_red(), tokens[0].italic());
-                std::process::exit(1);
+                if is_long_macro && !tokens[0].starts_with('.') {
+                    if first_macro_line {
+                        while !line.chars().next().unwrap().is_alphanumeric() {
+                            line.remove(0);
+                        }
+                        first_macro_line = false;
+                    }
+                    long_macro.value.push_str(line.as_str());
+                    long_macro.value.push('\n');
+                } else {
+                    eprintln!("{}: unknown preprocessor derictive: {}", "ERROR".bright_red(), tokens[0].italic());
+                    std::process::exit(1);
+                }
             }
         }
     }

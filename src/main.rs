@@ -18,17 +18,19 @@ fn main() {
         let output_fname = matches.value_of("output").unwrap().to_string();
         let verbosity = matches.is_present("verbose");
 
+        if verbosity { println!("{}: Preprocessing", "INFO".cyan()) }
+
         let mut preproc = PreProcessor::new(read_file(input_fname.clone()), "macro_rules.m4".to_string());
         let code = preproc.preprocess(input_fname.clone());
 
-        if verbosity { println!("{}: Starting compiling", "INFO".cyan()) }
+        if verbosity { println!("{}: Compiling", "INFO".cyan()) }
         
         let mut compiler = Compiler::new(code);
         compiler.compile(true);
 
-        if verbosity { println!("{}: Finishing compiling", "INFO".cyan()) }
-        
-        write_file_bin(output_fname, compiler.get_binary());
+        if verbosity { println!("{}: Linking", "INFO".cyan()); }
+
+        // write_file_bin(output_fname, compiler.get_binary());
         if verbosity { bin_dump(compiler.get_binary()) }
     } else {
         eprintln!("{}: wasn't provided {}\nFor help run `{}`", "ERROR".bright_red(), "SUBCOMMAND".cyan(), "zas --help".green());

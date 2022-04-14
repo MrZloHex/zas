@@ -1,6 +1,8 @@
 .DEF	A 0d17
 .DEF	B 0d13
 
+SECTION TEXT
+
 	MIH 0x80
 	MIL 0x10
 	MIA A
@@ -20,3 +22,5 @@ loop:	ADC
 	MIL loop%L
 	JRZ
 	HLT
+
+END

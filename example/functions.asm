@@ -1,4 +1,24 @@
-_start:		MIH 0x81
+.DEF	
+
+.DEF	RET
+		POH
+		POL
+		JMP
+.ENDDEF
+
+
+
+
+.DEF	KEYBOARD_ADDRESS
+		MIH 0x8F
+		MIL 0x10
+.ENDDEF
+
+
+
+SECTION	TEXT
+
+		MIH 0x81
 		MIL 0x00
 		LSP
 	; MAIN SECTION
@@ -16,9 +36,7 @@ _here1:		MIA 0x69
 
 
 
-keyboard_input: MIH 0x8F ; MEMMAPED KEAYBOARD
-		MIL 0x10
-		
-		POH
-		POL
-		JMP
+keyboard_input: KEYBOARD_ADDRESS
+		RET
+
+END
