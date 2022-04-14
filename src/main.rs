@@ -30,7 +30,7 @@ fn main() {
 
         if verbosity { println!("{}: Linking", "INFO".cyan()); }
 
-        // write_file_bin(output_fname, compiler.get_binary());
+        write_file_bin(output_fname, compiler.get_binary());
         if verbosity { bin_dump(compiler.get_binary()) }
     } else {
         eprintln!("{}: wasn't provided {}\nFor help run `{}`", "ERROR".bright_red(), "SUBCOMMAND".cyan(), "zas --help".green());

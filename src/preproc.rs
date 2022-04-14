@@ -91,6 +91,8 @@ impl PreProcessor {
             
             let tokens: Vec<String> = line.split_whitespace().map(|s| s.to_string()).collect();
 
+            if tokens[0].starts_with(';') { continue; }
+
             if tokens[0] == ".DEF" {
                 if tokens.len() > 2 {
                     if tokens[2].is_empty() {

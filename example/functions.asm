@@ -1,4 +1,12 @@
-.DEF	
+.DEF	CALL
+		MIH $2%H
+		MIL $2%L
+		PUL
+		PUH
+		MIH $1%H
+		MIL $1%L
+		JMP
+.ENDDEF
 
 .DEF	RET
 		POH
@@ -23,13 +31,7 @@ SECTION	TEXT
 		LSP
 	; MAIN SECTION
 	; READ KEYBOARD MAYBE ??
-		MIH _here1%H
-		MIL _here1%L
-		PUL
-		PUH
-		MIH keyboard_input%H
-		MIL keyboard_input%L
-		JMP
+		CALL(keyboard_input, _here1)
 	; IN REG A IS CODE OF SYMBOL
 _here1:		MIA 0x69
 		HLT
