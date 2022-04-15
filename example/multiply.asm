@@ -1,6 +1,3 @@
-.DEF	A 0d2
-.DEF	B 0d4
-.DEF	C 0d8
 
 
 .DEF	CALL
@@ -23,17 +20,6 @@
 
 
 SECTION TEXT
-
-		MIH 0x81
-		MIL 0x00
-		LSP
-		MIA A
-		MIB B
-		CALL(multiply, _back1)
-_back1:		MIB C
-		CALL(multiply, _back2)
-_back2:		HLT
-
 
 multiply:	MID 1
 		MAC

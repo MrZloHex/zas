@@ -1,31 +1,27 @@
-.DEF	my_var 0x80
-.DEF	MACRO HLT
-
-.DEF	FUNC
-		MIA $1
-		MIB $2
-.ENDDEF
+.DEF	A 0d2
+.DEF	B 0d4
+.DEF	C 0d8
 
 SECTION TEXT
+		MIH _start%H
+		MIL _start%L
+		JMP
 
-		MAC my_var
-		MIL 0xFF
-		MIH jump%H
-		MIL jump%L
-label:		MIA 0o32
-		MIB 0b110
-		LSP
-		FUNC(0xBE, 0xEF)
 END
 
+.INCLUDE	multiply.asm
 
 SECTION TEXT
 
-		ADB
-jump:		MIH label%H
-		MIL label%L
-	; COMMENT
-		JMP
-		MACRO
+_start:		MIH 0x81
+		MIL 0x00
+		LSP
+		MIA A
+		MIB B
+		CALL(multiply, _back1)
+_back1:		MIB C
+		CALL(multiply, _back2)
+_back2:		HLT
+
 
 END
