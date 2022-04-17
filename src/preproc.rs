@@ -1,5 +1,5 @@
 use colored::*;
-use crate::file::write_file;
+use crate::file::{write_file, read_file};
 
 use std::process::Command;
 
@@ -23,26 +23,29 @@ impl Macro {
 pub struct PreProcessor {
     data: Vec<String>,
     macro_rules: Vec<Macro>,
-    mrfname: String
+    mrfname: String,
+    base_path: String
 }
 
 impl PreProcessor {
-    pub fn new(data: Vec<String>, mrfname: String) -> PreProcessor {
+    pub fn new(data: Vec<String>, mrfname: String, base_path: String) -> PreProcessor {
         PreProcessor {
             data,
             macro_rules: Vec::new(),
-            mrfname
+            mrfname,
+            base_path
         }
     }
 
-    pub fn preprocess(&mut self, in_fname: String) -> Vec<String> {
+    pub fn preprocess(&mut self, tmp_fname: String) -> Vec<String> {
         self.parse_macros();
         self.make_m4_rules();
+        write_file(tmp_fname.clone(), self.data.clone());
 
         let preproc = Command::new("m4")
                                         .arg("-P")
                                         .arg(self.mrfname.clone())
-                                        .arg(in_fname)
+                                        .arg(tmp_fname)
                                         .output()
                                         .expect("Failed to preprocess with M4");
 
@@ -113,7 +116,16 @@ impl PreProcessor {
                 long_macro.value.pop();
                 self.macro_rules.push(long_macro);
                 long_macro = Macro::new();
-                first_macro_line = true;
+                first_macro_line = true;    
+            } else if tokens[0] == ".INCLUDE" {
+                if tokens.len() < 1 {
+                    eprintln!("{}: filepath to include doesn't provide at line {}", "ERROR".bright_red(), index);
+                    std::process::exit(1);
+                }
+                self.data.remove(index-1);
+                for (i, l) in read_file(format!("{}/{}", self.base_path, tokens[1].clone())).iter().enumerate() {
+                    self.data.insert(index+i, (*l).clone());
+                }
             } else {
                 if is_long_macro && !tokens[0].starts_with('.') {
                     if first_macro_line {

@@ -15,13 +15,14 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("build") {
         let input_fname = matches.value_of("input").unwrap().to_string();
+        let base_path = input_fname.rsplit_once('/').unwrap_or(("","")).0.to_string();
         let output_fname = matches.value_of("output").unwrap().to_string();
         let verbosity = matches.is_present("verbose");
 
         if verbosity { println!("{}: Preprocessing", "INFO".cyan()) }
 
-        let mut preproc = PreProcessor::new(read_file(input_fname.clone()), "macro_rules.m4".to_string());
-        let code = preproc.preprocess(input_fname);
+        let mut preproc = PreProcessor::new(read_file(input_fname.clone()), "macro_rules.m4".to_string(), base_path);
+        let code = preproc.preprocess("output.zas".to_string());
 
         if verbosity { println!("{}: Compiling", "INFO".cyan()) }
         
