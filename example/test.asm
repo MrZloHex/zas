@@ -1,22 +1,19 @@
+.INCLUDE	std.asm
+
 .DEF	A 0d2
 .DEF	B 0d4
 .DEF	C 0d8
 
 SECTION TEXT
-		MIH _start%H
-		MIL _start%L
+		LEA(_start)
 		JMP
-
 END
 
-.INCLUDE	std.asm
 .INCLUDE	multiply.asm
 
 SECTION TEXT
 
-_start:		MIH 0x81
-		MIL 0x00
-		LSP
+_start:		INIT_STACK
 		MIA A
 		MIB B
 		CALL(multiply, _back1)
@@ -26,3 +23,4 @@ _back2:		HLT
 
 
 END
+

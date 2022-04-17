@@ -230,6 +230,10 @@ impl Compiler {
                             }
                         }
                     }
+                } else if is_sec_data {
+                    unimplemented!("SECTION DATA WILL BE IMPLEMENTED SOON");
+                } else if is_sec_bss {
+                    unimplemented!("SECTION BSS WILL BE IMPLEMENTED SOON");
                 }
             }
             self.line = 0;
