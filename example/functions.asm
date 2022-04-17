@@ -1,21 +1,4 @@
-.DEF	CALL
-		MIH $2%H
-		MIL $2%L
-		PUL
-		PUH
-		MIH $1%H
-		MIL $1%L
-		JMP
-.ENDDEF
-
-.DEF	RET
-		POH
-		POL
-		JMP
-.ENDDEF
-
-
-
+.INCLUDE	std.asm
 
 .DEF	KEYBOARD_ADDRESS
 		MIH 0x8F
@@ -23,9 +6,7 @@
 .ENDDEF
 
 
-
-SECTION	TEXT
-
+SECTION TEXT
 		MIH 0x81
 		MIL 0x00
 		LSP
@@ -40,5 +21,4 @@ _here1:		MIA 0x69
 
 keyboard_input: KEYBOARD_ADDRESS
 		RET
-
 END

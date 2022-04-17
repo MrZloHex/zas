@@ -9,6 +9,7 @@ SECTION TEXT
 
 END
 
+.INCLUDE	std.asm
 .INCLUDE	multiply.asm
 
 SECTION TEXT

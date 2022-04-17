@@ -40,12 +40,14 @@ impl PreProcessor {
     pub fn preprocess(&mut self, tmp_fname: String) -> Vec<String> {
         self.parse_macros();
         self.make_m4_rules();
+
+        // Save all source code into one file to preprocess it wiht m4
         write_file(tmp_fname.clone(), self.data.clone());
 
         let preproc = Command::new("m4")
                                         .arg("-P")
                                         .arg(self.mrfname.clone())
-                                        .arg(tmp_fname)
+                                        .arg(tmp_fname.clone())
                                         .output()
                                         .expect("Failed to preprocess with M4");
 
@@ -59,10 +61,11 @@ impl PreProcessor {
 
         // REMOVE M4 RULES FILE
 
-        // let _ = Command::new("rm")
-        //                         .arg(self.mrfname.clone())
-        //                         .output()
-        //                         .expect("Failed to delete tmp files");
+        let _ = Command::new("rm")
+                                .arg(self.mrfname.clone())
+                                .arg(tmp_fname)
+                                .output()
+                                .expect("Failed to delete tmp files");
                                 
         output.split('\n').map(|s| s.to_string()).collect()
     }
@@ -122,10 +125,12 @@ impl PreProcessor {
                     eprintln!("{}: filepath to include doesn't provide at line {}", "ERROR".bright_red(), index);
                     std::process::exit(1);
                 }
-                self.data.remove(index-1);
+                index -= 1;
+                self.data.remove(index);
                 for (i, l) in read_file(format!("{}/{}", self.base_path, tokens[1].clone())).iter().enumerate() {
                     self.data.insert(index+i, (*l).clone());
                 }
+
             } else {
                 if is_long_macro && !tokens[0].starts_with('.') {
                     if first_macro_line {
