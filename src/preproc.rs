@@ -127,7 +127,7 @@ impl PreProcessor {
                 }
                 index -= 1;
                 self.data.remove(index);
-                for (i, l) in read_file(format!("{}/{}", self.base_path, tokens[1].clone())).iter().enumerate() {
+                for (i, l) in read_file(format!("{}{}", self.base_path, tokens[1].clone())).iter().enumerate() {
                     self.data.insert(index+i, (*l).clone());
                 }
 

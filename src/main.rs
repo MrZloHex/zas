@@ -15,7 +15,8 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("build") {
         let input_fname = matches.value_of("input").unwrap().to_string();
-        let base_path = input_fname.rsplit_once('/').unwrap_or(("","")).0.to_string();
+        let mut base_path = input_fname.rsplit_once('/').unwrap_or(("","")).0.to_string();
+        if !base_path.is_empty() { base_path.push('/'); }
         let output_fname = matches.value_of("output").unwrap().to_string();
         let verbosity = matches.is_present("verbose");
 
