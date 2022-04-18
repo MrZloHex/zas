@@ -1,9 +1,5 @@
 .INCLUDE	std.asm
 
-.DEF	A 0d2
-.DEF	B 0d4
-.DEF	C 0d8
-
 SECTION TEXT
 		LEA(_start)
 		JMP
@@ -14,13 +10,36 @@ END
 SECTION TEXT
 
 _start:		INIT_STACK
-		MIA A
-		MIB B
+		LEA(num_A)
+		MMA
+		LEA(num_B)
+		MMB
 		CALL(multiply, _back1)
-_back1:		MIB C
+_back1:		LEA(num_C)
+		MMB
 		CALL(multiply, _back2)
-_back2:		HLT
-
+_back2:		LEA(result)
+		MAM
+		MAB
+		MAC
+		MAD
+		MAE
+		MAH
+		MAL
+		HLT
 
 END
 
+SECTION BSS
+
+result:		1
+
+END
+
+SECTION DATA
+
+num_A:		0x02 0x05
+num_B:		0x04
+num_C:		0x08
+
+END

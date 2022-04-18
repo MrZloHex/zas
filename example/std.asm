@@ -1,4 +1,5 @@
 .DEF	LEA
+	; Load Effective Address
 		MIH $1%H
 		MIL $1%L
 .ENDDEF

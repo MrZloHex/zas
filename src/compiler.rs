@@ -101,11 +101,11 @@ impl Compiler {
                             eprintln!("{}: labels can't starts with {} or {} - `{}`", "ERROR".bright_red(), "NUMBER".bold(), "DOT".bold(), tokens[0]);
                             std::process::exit(1);
                         }
-                        if verbosity {
-                            println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
-                        }
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
+                            if verbosity {
+                                println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
+                            }
                         }
                         true
                     } else {
@@ -149,30 +149,7 @@ impl Compiler {
                                 self.binary.push(op);
                             }
                             let imm = if imm_str.chars().next().unwrap().is_numeric() {
-                                let (radix, val_str, error_str) = if imm_str.starts_with("0x") {
-                                    let hex_val = imm_str.strip_prefix("0x").unwrap();
-                                    (16, hex_val, "HEX".to_string())
-                                } else if imm_str.starts_with("0b") {
-                                    let bin_val = imm_str.strip_prefix("0b").unwrap();
-                                    (2, bin_val, "BIN".to_string())
-                                } else if imm_str.starts_with("0o") {
-                                    let oct_val = imm_str.strip_prefix("0o").unwrap();
-                                    (8, oct_val, "OCT".to_string())
-                                } else {
-                                    let dec_val = match imm_str.strip_prefix("0d") {
-                                        Some(val) => val,
-                                        None => imm_str.as_str()
-                                    };
-                                    (10, dec_val, "DEC".to_string())
-                                };
-                                let imm: u8 = match u8::from_str_radix(val_str, radix) {
-                                    Ok(val) => val,
-                                    Err(_) => {
-                                        eprintln!("{}: incorrect immediate {} value {} at line {}", "ERROR".bright_red(), error_str, tokens[1].bold(), self.line);
-                                        std::process::exit(1);
-                                    }
-                                };
-                                imm
+                                indetify_number(imm_str)
                             } else if cycle != 0 {
                                 if imm_str.contains('%') {
                                     let label_toks: Vec<&str> = imm_str.split('%').collect();
@@ -231,9 +208,52 @@ impl Compiler {
                         }
                     }
                 } else if is_sec_data {
-                    unimplemented!("SECTION DATA WILL BE IMPLEMENTED SOON");
+                    if tokens[0].ends_with(':') {
+                        tokens[0].pop();
+                        if cycle == 0 {
+                            self.labels.insert(tokens[0].clone(), self.label_address);
+                            if verbosity {
+                                println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
+                            }
+                        }
+                        if tokens.len() < 1 {
+                            eprintln!("{}: value of data wasn't provide at line {}", "ERROR".bright_red(), self.line);
+                            std::process::exit(1);
+                        }
+                        for i in 1..tokens.len() {
+                            if cycle == 1 {
+                                self.binary.push(indetify_number(tokens[i].clone()));
+                            }
+                            self.label_address += 1;
+                        }
+                    } else {
+                        eprintln!("{}: data section is only for labels", "ERROR".bright_red());
+                        std::process::exit(69);
+                    }
                 } else if is_sec_bss {
-                    unimplemented!("SECTION BSS WILL BE IMPLEMENTED SOON");
+                    if tokens[0].ends_with(':') {
+                        tokens[0].pop();
+                        if cycle == 0 {
+                            self.labels.insert(tokens[0].clone(), self.label_address);
+                            if verbosity {
+                                println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
+                            }
+                        }
+                        if tokens.len() < 1 {
+                            eprintln!("{}: quantity of bytes wasn't provide at line {}", "ERROR".bright_red(), self.line);
+                            std::process::exit(1);
+                        }
+                        let resb = indetify_number(tokens[1].clone());
+                        for i in 0..resb {
+                            if cycle == 1 {
+                                self.binary.push(0);
+                            }
+                            self.label_address += 1;
+                        }
+                    } else {
+                        eprintln!("{}: data section is only for labels", "ERROR".bright_red());
+                        std::process::exit(69);
+                    }
                 }
             }
             self.line = 0;
@@ -253,4 +273,31 @@ fn _correct_first_char(ch: char) -> bool {
         '_' => true,
         _ => false
     }
+}
+
+fn indetify_number(imm_str: String) -> u8 {
+    let (radix, val_str, error_str) = if imm_str.starts_with("0x") {
+        let hex_val = imm_str.strip_prefix("0x").unwrap();
+        (16, hex_val, "HEX".to_string())
+    } else if imm_str.starts_with("0b") {
+        let bin_val = imm_str.strip_prefix("0b").unwrap();
+        (2, bin_val, "BIN".to_string())
+    } else if imm_str.starts_with("0o") {
+        let oct_val = imm_str.strip_prefix("0o").unwrap();
+        (8, oct_val, "OCT".to_string())
+    } else {
+        let dec_val = match imm_str.strip_prefix("0d") {
+            Some(val) => val,
+            None => imm_str.as_str()
+        };
+        (10, dec_val, "DEC".to_string())
+    };
+    let imm: u8 = match u8::from_str_radix(val_str, radix) {
+        Ok(val) => val,
+        Err(_) => {
+            eprintln!("{}: incorrect immediate {} value {}", "ERROR".bright_red(), error_str, imm_str.bold());
+            std::process::exit(1);
+        }
+    };
+    imm
 }
