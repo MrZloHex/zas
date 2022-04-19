@@ -44,7 +44,7 @@ It's an assembler for processor **ZP-80**
  - [ ] Address arithmetic
  - [ ] Making offsets
 
-<!-- ## Description
+## Description
 
 ### Diagram
 
@@ -66,6 +66,8 @@ It's an assembler for processor **ZP-80**
 +---------------+    +--------+  |   +--------+   |  +----------+
                                  \----------------/
 ```
+
+<!--
 
 ### Basement
 
