@@ -1,6 +1,7 @@
 use colored::*;
 use crate::file::{write_file, read_file};
 
+use std::cmp::Ordering;
 use std::process::Command;
 
 
@@ -100,19 +101,22 @@ impl PreProcessor {
             if tokens[0].starts_with(';') { continue; }
 
             if tokens[0] == ".DEF" {
-                if tokens.len() > 2 {
-                    if tokens[2].is_empty() {
-                        eprintln!("{}: value of macro {} is {}", "ERROR".bright_red(), tokens[1].italic(), "NULL".bold());
+                match tokens.len().cmp(&2) {
+                    Ordering::Greater => {
+                        if tokens[2].is_empty() {
+                            eprintln!("{}: value of macro {} is {}", "ERROR".bright_red(), tokens[1].italic(), "NULL".bold());
+                            std::process::exit(1);
+                        }
+                        self.macro_rules.push(Macro::make(tokens[1].clone(), tokens[2].clone()));
+                    },
+                    Ordering::Equal => {
+                        is_long_macro = true;
+                    long_macro.name = tokens[1].clone();
+                    },
+                    _ => {
+                        eprintln!("{}: not defined macro name", "ERROR".bright_red());
                         std::process::exit(1);
                     }
-                    self.macro_rules.push(Macro::make(tokens[1].clone(), tokens[2].clone()));
-                } else if tokens.len() == 2 {
-
-                    is_long_macro = true;
-                    long_macro.name = tokens[1].clone();
-                } else {
-                    eprintln!("{}: not defined macro name", "ERROR".bright_red());
-                    std::process::exit(1);
                 }
             } else if tokens[0] == ".ENDDEF" {
                 is_long_macro = false;
@@ -121,7 +125,7 @@ impl PreProcessor {
                 long_macro = Macro::new();
                 first_macro_line = true;    
             } else if tokens[0] == ".INCLUDE" {
-                if tokens.len() < 1 {
+                if tokens.len() < 2 {
                     eprintln!("{}: filepath to include doesn't provide at line {}", "ERROR".bright_red(), index);
                     std::process::exit(1);
                 }
@@ -131,20 +135,18 @@ impl PreProcessor {
                     self.data.insert(index+i, (*l).clone());
                 }
 
-            } else {
-                if is_long_macro && !tokens[0].starts_with('.') {
-                    if first_macro_line {
-                        while !line.chars().next().unwrap().is_alphanumeric() {
-                            line.remove(0);
-                        }
-                        first_macro_line = false;
+            } else if is_long_macro && !tokens[0].starts_with('.') {
+                if first_macro_line {
+                    while !line.chars().next().unwrap().is_alphanumeric() {
+                        line.remove(0);
                     }
-                    long_macro.value.push_str(line.as_str());
-                    long_macro.value.push('\n');
-                } else {
-                    eprintln!("{}: unknown preprocessor derictive: {}", "ERROR".bright_red(), tokens[0].italic());
-                    std::process::exit(1);
+                    first_macro_line = false;
                 }
+                long_macro.value.push_str(line.as_str());
+                long_macro.value.push('\n');
+            } else {
+                eprintln!("{}: unknown preprocessor derictive: {}", "ERROR".bright_red(), tokens[0].italic());
+                std::process::exit(1);
             }
         }
     }

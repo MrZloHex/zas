@@ -185,11 +185,7 @@ impl Dictionary<'_> {
     pub fn get_opcode(&self, string: &str) -> (Option<&u8>, bool) {
         let opcode = self.opcodes.get(string);
         let byte = if let Some(&op) = opcode {
-            if op < 7 {
-                true
-            } else {
-                false
-            }
+            op < 7
         } else {
             false
         };

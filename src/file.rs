@@ -34,7 +34,7 @@ pub fn write_file(filename: String, data: Vec<String>) {
         for byte in line.as_bytes() {
             val.push(*byte);
         }
-        val.push('\n' as u8);
+        val.push(b'\n');
     }
     file.write_all(&val);
 }

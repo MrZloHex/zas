@@ -216,13 +216,13 @@ impl Compiler {
                                 println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
-                        if tokens.len() < 1 {
+                        if tokens.len() < 2 {
                             eprintln!("{}: value of data wasn't provide at line {}", "ERROR".bright_red(), self.line);
                             std::process::exit(1);
                         }
-                        for i in 1..tokens.len() {
+                        for i in tokens.iter().skip(1) {
                             if cycle == 1 {
-                                self.binary.push(indetify_number(tokens[i].clone()));
+                                self.binary.push(indetify_number((*i).clone()));
                             }
                             self.label_address += 1;
                         }
@@ -239,7 +239,7 @@ impl Compiler {
                                 println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
-                        if tokens.len() < 1 {
+                        if tokens.len() < 2 {
                             eprintln!("{}: quantity of bytes wasn't provide at line {}", "ERROR".bright_red(), self.line);
                             std::process::exit(1);
                         }
@@ -262,16 +262,6 @@ impl Compiler {
 
     pub fn get_binary(&self) -> Vec<u8> {
         self.binary.clone()
-    }
-}
-
-fn _correct_first_char(ch: char) -> bool {
-    match ch {
-        ';' => true,
-        'A'..='Z' => true,
-        'a'..='z' => true,
-        '_' => true,
-        _ => false
     }
 }
 
