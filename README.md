@@ -41,7 +41,7 @@ It's an assembler for processor **ZP-80**
  - [X] Make multiple file system compilation
  - [X] Dividing code into segments
  - [X] DATA and BSS sections
- - [ ] Address arithmetic
+ - [X] Address arithmetic
  - [ ] Making offsets
  - [ ] Turing complete in preprocessing
 

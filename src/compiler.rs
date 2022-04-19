@@ -152,32 +152,20 @@ impl Compiler {
                                 indetify_number(imm_str)
                             } else if cycle != 0 {
                                 if imm_str.contains('%') {
-                                    let label_toks: Vec<&str> = imm_str.split('%').collect();
+                                    let label_toks: Vec<String> = imm_str.split('%').map(|s| s.to_string()).collect();
                                     if label_toks[1].is_empty() {
                                         eprintln!("{}: not specifed SIGNIFICANCE of address at line {}", "ERROR".bright_red(), self.line);
                                         std::process::exit(1);
                                     }
-                                    let imm = match label_toks[1] {
-                                        "H" => {
-                                            let address = match self.labels.get(label_toks[0]) {
-                                                Some(&add) => add,
-                                                None => {
-                                                    eprintln!("{}: no such label {} at line {}", "ERROR".bright_red(), label_toks[0].bold(), self.line);
-                                                    std::process::exit(1);
-                                                }
-                                            };
-                                            (address >> 8) as u8
-                                        },
-                                        "L" => {
-                                            let address = match self.labels.get(label_toks[0]) {
-                                                Some(&add) => add,
-                                                None => {
-                                                    eprintln!("{}: no such label {} at line {}", "ERROR".bright_red(), label_toks[0].bold(), self.line);
-                                                    std::process::exit(1);
-                                                }
-                                            };
-                                            address as u8
-                                        },
+                                    let address = if label_toks[0].contains('+') || label_toks[0].contains('-') {
+                                        self.eval_address(label_toks[0].clone())
+                                    } else {
+                                        self.get_address(&label_toks[0])
+                                    };
+
+                                    let imm = match label_toks[1].as_str() {
+                                        "H" => (address >> 8) as u8,
+                                        "L" => address as u8,
                                         _ => {
                                             eprintln!("{}: undefined SIGNIFICANCE of address at line {}", "ERROR".bright_red(), self.line);
                                             std::process::exit(1);
@@ -258,6 +246,71 @@ impl Compiler {
             }
             self.line = 0;
         }
+    }
+
+    fn get_address(&self, label: &String) -> u16 {
+        match self.labels.get(label) {
+            Some(&add) => add,
+            None => {
+                eprintln!("{}: no such label {} at line {}", "ERROR".bright_red(), label.bold(), self.line);
+                std::process::exit(1);
+            }
+        }
+    }
+
+    fn eval_address(&self, cl: String) -> u16 {
+        let mut complex_label = cl;
+        let mut add = true;
+        let mut address: u16 = 0;
+        while complex_label.contains('+') || complex_label.contains('-') {
+            let label = complex_label;
+            println!("LAB {}", label);
+
+            let mut next_add = true;
+            let mut t = label.split_once('+');
+            if let None = t {
+                if label.contains('-') {
+                    t = label.split_once('-');
+                    next_add = false;
+                } else {
+                    complex_label = label;
+                    break;
+                }
+            } else {
+                if t.unwrap().0.contains('-') {
+                    t = label.split_once('-');
+                    next_add = false;
+                }
+            }
+
+            let terms = t.unwrap();
+            complex_label = terms.1.to_string();
+
+            let val = if terms.0.chars().next().unwrap().is_numeric() {
+                terms.0.parse::<u16>().unwrap()
+            } else {
+                self.get_address(&(terms.0.to_string()))
+            };
+        
+            if add {
+                address += val;
+            } else {
+                address -= val;
+            }
+            add = next_add;
+        }
+        let val = if complex_label.chars().next().unwrap().is_numeric() {
+            complex_label.parse::<u16>().unwrap()
+        } else {
+            self.get_address(&complex_label)
+        };
+
+        if add {
+            address += val;
+        } else {
+            address -= val;
+        }
+        address
     }
 
     pub fn get_binary(&self) -> Vec<u8> {
