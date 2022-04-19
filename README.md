@@ -58,9 +58,7 @@ It's an assembler for processor **ZP-80**
 | output.bin | <- | Compiling | <- | Parsing labels | <---/
 +------------+    +-----------+    +----------------+
 ```
-
 <!--
-
 ### Basement
 
 This project is based on [*MCS-8*](https://en.wikichip.org/wiki/intel/mcs-8).</br>
@@ -98,7 +96,7 @@ Parametres of MCS-8:
 | S    | Sign        |
 | P    | Parity      |
 
-##### ALU
+##### ALU|
 
 ALU can do arithmetic and logical operations:
 `ADD, ADD with carry, SUBTRACT, SUBSTRACT with borrow, AND, EXCLUSIVE OR, OR, COMPARE, INCREMENT, DECREMENT`
@@ -165,6 +163,8 @@ See more information:
  - Calling or jumping to a label, the label name should starts from ampersand (`&`)
  - You can write values in different bases, for specify base you should write after value (`'d'`, `'h'`, `'o'`, `'b'`) for decimal, hexadecimal, octal and binary accordingly
 
+-->
+
 ## Deployment
 
 **NOTE**</br>
@@ -185,19 +185,19 @@ Or see official [guide](https://github.com/rust-lang/cargo)
 ### Installation
 
 1. Download or clone this repo:
-	- Git: `$ git clone https://github.com/MrZloHex/emuBOOB.git`
-2. Change working directory to *lscc*:
-	- `$ cd emuBOOB`
+	- Git: `$ git clone https://github.com/MrZloHex/zas.git`
+2. Change working directory to *zas*:
+	- `$ cd zas`
 3. Run *installation* script:
-	- `$ ./deployment.sh -i`
+	- `$ ./install.sh -i`
 	- **NOTE** You need to have **sudo** access.
 
 ### Uninstallation
 
-1. Change working directory to *lscc*:
-	- `$ cd emuBOOB`
+1. Change working directory to *zas*:
+	- `$ cd zas`
 2. Run *uninstallation* script:
-	- `$ ./deployment.sh -u`
+	- `$ ./install.sh -u`
 3. Go out from directory:
 	- `$ cd ..`
 
@@ -205,7 +205,7 @@ Or see official [guide](https://github.com/rust-lang/cargo)
 
 ### Building
 
-emuBOOB's compiler supporting only `.asm` files with very strcit rules.</br>
+ZAS's compiler supporting only `.asm` files with very strcit rules.</br>
 For build your assembly code for i8008 run this:</br>
 	`$ emuBOOB build --input="<PATH TO YOUR CODE>"`</br>
 
@@ -261,10 +261,12 @@ Flags for `run` subcommand:
 
 ## Examples
 
-There are some examples of programs in [examples](https://github.com/MrZloHex/emuBOOB/tree/master/examples) directory.
+There are some examples of programs in [examples](examples) directory.
 
-Try emulate `multiply.asm` in emuBOOB. For this run:</br>
-`$ emuBOOB run --input="examples/multiply.asm" --output="exaples_target/multiply" --build`
+Try compile `multiply.asm` with _zas_. For this run:</br>
+`$ zas build --input="examples/multiply.asm" --output="multiply"`
+
+<!--
 
 ## References
 
