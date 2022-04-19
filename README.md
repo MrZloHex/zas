@@ -44,6 +44,7 @@ It's an assembler for processor **ZP-80**
  - [X] Address arithmetic
  - [ ] Making offsets
  - [ ] Turing complete in preprocessing
+ - [ ] Vim syntax highlighting
 
 ## Description
 

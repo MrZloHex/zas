@@ -264,7 +264,6 @@ impl Compiler {
         let mut address: u16 = 0;
         while complex_label.contains('+') || complex_label.contains('-') {
             let label = complex_label;
-            println!("LAB {}", label);
 
             let mut next_add = true;
             let mut t = label.split_once('+');
@@ -276,11 +275,9 @@ impl Compiler {
                     complex_label = label;
                     break;
                 }
-            } else {
-                if t.unwrap().0.contains('-') {
-                    t = label.split_once('-');
-                    next_add = false;
-                }
+            } else if t.unwrap().0.contains('-') {
+                t = label.split_once('-');
+                next_add = false;
             }
 
             let terms = t.unwrap();
