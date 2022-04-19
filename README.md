@@ -4,12 +4,12 @@
 
 It's an assembler for processor **ZP-80**
 
-<!-- ## Table of contents
+## Table of contents
 
  * [Roadmap](#roadmap)
  * [Description](#description)
  	* [Diagram](#diagram)
- 	* [Basement](#basement)
+ 	<!--* [Basement](#basement)
  		* [CPU](#cpu)
  			* [Registers](#registers)
  			* [Flags](#flags)
@@ -19,7 +19,7 @@ It's an assembler for processor **ZP-80**
  		* [Memory](#memory)
  			* [PROM](#prom)
  			* [RAM](#ram)
- 	* [Emulator](#emulator)
+ 	* [Emulator](#emulator) -->
  	* [Compiler](#compiler)
  		* [Rules](#assembler-syntax-rules)
  * [Deployment](#deployment)
@@ -30,7 +30,7 @@ It's an assembler for processor **ZP-80**
 	* [Building](#building)
 	* [Running](#running)
  * [Examples](#examples)
- * [References and manuals](#references) -->
+<!-- * [References and manuals](#references) -->
 
 
 ## RoadMap
@@ -67,85 +67,6 @@ Parametres of MCS-8:
  - **Memory**:
     - *PROM*:  2 KB
     - *RAM*:   1 KB
-
-#### CPU
-
-**i8008-1** is impoved version of standart i8008 with decreased cycle time (from 20 µs to 12.5 µs).</br>
-*Futher in the text i8008-1 will be named just **8008***
-
-##### Registers
-
-| Name | Length | Description          |
-|------|--------|----------------------|
-| A    | 8  bit | Accumulator          |
-| B    | 8  bit | GPR<sup>[1](#GPR)</sup>           |
-| C    | 8  bit | GPR                  |
-| D    | 8  bit | GPR                  |
-| E    | 8  bit | GPR                  |
-| H    | 8  bit | GPR/High byte of address for MI<sup>[2](#MI)</sup>                  |
-| L    | 8  bit | GPR/Low byte of address for MI                  |
-| PC   | 14 bit | Program Counter<sup>[3](#PC)</sup> |
-| SP   | 3  bit | Stack Pointer        |
-
-##### Flags
-
-| Name | Description |
-|------|-------------|
-| C    | Carry       |
-| Z    | Zero        |
-| S    | Sign        |
-| P    | Parity      |
-
-##### ALU|
-
-ALU can do arithmetic and logical operations:
-`ADD, ADD with carry, SUBTRACT, SUBSTRACT with borrow, AND, EXCLUSIVE OR, OR, COMPARE, INCREMENT, DECREMENT`
-
-All ALU operations have influence on flags' flip-flops.</br>
-But `INCREMENT` and `DECREMENT` don't touch `C` (carry) flag.
-
-##### Stack
-
-Stack in 8008 is located in proccessor. Subsequently, it has only **7 levels** of deepnest.</br>
-*SP* is 3 bit length and you can't change its value.
-
-If you overflow stack level it would erase first levels.
-Try to prevent this overflow!
-
-##### Instruction Set
-
-![InstructionSet](https://github.com/MrZloHex/emuBOOB/blob/master/manuls/instuctions.png)
-
-*Took from page 8-9 of 8008 [manual](https://github.com/MrZloHex/emuBOOB/blob/master/manuls/8008-Intel.pdf)*
-
-#### Memory
-
-In *MCS-8* memory block is separated into 2 parts.
-
-##### PROM
-
-Capacity of **PROM** is 2 KB.</br>
-One *word* length is 1 Byte.
-
-**PROM** is used to contain programme's code.</br>
-You CAN'T write in PROM in runtime. For this use [RAM](#ram)
-
-##### RAM
-
-Capacity of **RAM** is 1 KB.</br>
-One *word* length is 1 Byte
-
-**RAM** is used to save data in runtime.</br>
-After finishing executing programme all data from **RAM** would be erased.
-
-### Emulator
-
-Emulator is very close to real structure and ecosystem of MCS-8.</br>
-Emualator has pretty dump output of *CPU* and *Memory*.
-
-See more information:
- - `$ emuBOOB run help`
- - `$ man emuBOOB`
 
 ### Compiler
 
