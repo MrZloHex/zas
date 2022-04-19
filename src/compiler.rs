@@ -244,7 +244,7 @@ impl Compiler {
                             std::process::exit(1);
                         }
                         let resb = indetify_number(tokens[1].clone());
-                        for i in 0..resb {
+                        for _ in 0..resb {
                             if cycle == 1 {
                                 self.binary.push(0);
                             }

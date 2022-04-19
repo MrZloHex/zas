@@ -205,11 +205,8 @@ Or see official [guide](https://github.com/rust-lang/cargo)
 
 ### Building
 
-ZAS's compiler supporting only `.asm` files with very strcit rules.</br>
-For build your assembly code for i8008 run this:</br>
-	`$ emuBOOB build --input="<PATH TO YOUR CODE>"`</br>
-
-This would make bianry file in same directory, which after you can execute in emulator
+For build your assembly code for ZP-80 run this:</br>
+	`$ zas build --input="<PATH TO YOUR CODE>" --output="<PATH TO OUTPUT BINARY>"`</br>
 
 Options for `build` subcommand:
  - **-i**,  **--input**:</br>
@@ -223,41 +220,11 @@ Options for `build` subcommand:
 
 Flags for `build` subcommand:
  - **-v**, **--verbose**:</br>
-	Will be displayed your assembly code and after opcodes for i8008.
+	Will be displayed your assembly code and after opcodes for ZP-80.
  - **-V**, **--version**:</br>
-	You will see version of compiler for 8008.
+	You will see version of ZAS.
  - **-h**, **--help**:</br>
 	Display help information about compiler.
-
-### Running
-
-Emulator can execute binary made obly by emuBOOB's compiler.</br>
-To run compiled binary on i8008 run:</br>
-	`$ emuBOOB run --input="<PATH TO BINARY>"`
-
-Options for `run` subcommand:
- - **-i**, **--input**:</br>
-	This is obligatory option, where you specify the path to the binary file or source code (see `-b` flag)</br>
-	E. g. `$ emuBOOB run --input="target/my_app"`
- - **-o**, **--ouput**:</br>
-	This option is usefull only with `-b` flag, when you building before executing.</br>
-	E. g. `$ emuBOOB run --input="project/src/main.asm" --output="target/my_app" --build`
-
-</br>
-
-Flags for `run` subcommand:
- - **-v**, **--verbose**:</br>
-	Will be displayed more information about instructions and will display memory dump.
- - **-b**, **--build**:</br>
-	This flag specifying that you would **build** *input* file and after that execute *output* file in emulator.
- - **-m**, **--manual**:</br>
-	This flag giving opportunity to execute instructions one by one with control</br>
-	 * Press `enter` to execute next instruction</br> 
-	 * Press `q` to stop executing
- - **-V**, **--version**:</br>
-	You will see version of emulator of 8008.
- - **-h**, **--help**:</br>
-	Display help information about emulator.
 
 ## Examples
 
