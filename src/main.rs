@@ -28,7 +28,7 @@ fn main() {
         if verbosity { println!("{}: Compiling", "INFO".cyan()) }
         
         let mut compiler = Compiler::new(code);
-        compiler.compile(true);
+        compiler.compile(verbosity);
 
         if verbosity { println!("{}: Linking", "INFO".cyan()); }
 

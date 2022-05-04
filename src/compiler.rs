@@ -25,7 +25,7 @@ impl Compiler {
     }
 
     pub fn compile(&mut self, verbosity: bool) {
-        if verbosity { println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
+        // if verbosity {  println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
     
         let mut is_sec_text = false;
         let mut is_sec_data = false;
@@ -104,7 +104,7 @@ impl Compiler {
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
                             if verbosity {
-                                println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
+                                // println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
                         true
@@ -201,7 +201,7 @@ impl Compiler {
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
                             if verbosity {
-                                println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
+                                // println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
                         if tokens.len() < 2 {
@@ -224,7 +224,7 @@ impl Compiler {
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
                             if verbosity {
-                                println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
+                                // println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
                         if tokens.len() < 2 {

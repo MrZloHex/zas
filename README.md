@@ -42,8 +42,8 @@ It's an assembler for processor **ZP-80**
  - [X] Dividing code into segments
  - [X] DATA and BSS sections
  - [X] Address arithmetic
- - [ ] Making offsets
  - [ ] Turing complete in preprocessing
+ - [ ] Making offsets
  - [ ] Vim syntax highlighting
 
 ## Description

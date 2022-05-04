@@ -58,7 +58,7 @@ impl PreProcessor {
         }
 
         let output = String::from_utf8(preproc.stdout).unwrap();
-        println!("Preproc output:\n{}\nEND", output);
+        // println!("Preproc output:\n{}\nEND", output);
 
         // REMOVE M4 RULES FILE
 
@@ -77,6 +77,10 @@ impl PreProcessor {
         let mut is_long_macro = false;
         let mut first_macro_line = true;
         let mut long_macro = Macro::new();
+
+        // let mut is_if_macro = false;
+        // let mut if_macro = Macro::new();
+        // let mut else_macro = Macro::new();
 
         let mut is_section = false;
 
@@ -100,7 +104,13 @@ impl PreProcessor {
 
             if tokens[0].starts_with(';') { continue; }
 
-            if tokens[0] == ".DEF" {
+            if tokens[0] == ".DEFINE" {
+                if tokens.len() < 2 || tokens[1].is_empty() {
+                    eprintln!("{}: not defined macro name", "ERROR".bright_red());
+                    std::process::exit(1);
+                }
+                self.macro_rules.push(Macro::make(tokens[1].clone(), String::new()));
+            } else if tokens[0] == ".DEF" {
                 match tokens.len().cmp(&2) {
                     Ordering::Greater => {
                         if tokens[2].is_empty() {
@@ -111,7 +121,7 @@ impl PreProcessor {
                     },
                     Ordering::Equal => {
                         is_long_macro = true;
-                    long_macro.name = tokens[1].clone();
+                        long_macro.name = tokens[1].clone();
                     },
                     _ => {
                         eprintln!("{}: not defined macro name", "ERROR".bright_red());
@@ -134,7 +144,6 @@ impl PreProcessor {
                 for (i, l) in read_file(format!("{}{}", self.base_path, tokens[1].clone())).iter().enumerate() {
                     self.data.insert(index+i, (*l).clone());
                 }
-
             } else if is_long_macro && !tokens[0].starts_with('.') {
                 if first_macro_line {
                     while !line.chars().next().unwrap().is_alphanumeric() {
