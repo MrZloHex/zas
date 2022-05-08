@@ -104,13 +104,18 @@ impl Compiler {
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
                             if verbosity {
-                                // println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
+                                println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
                             }
                         }
                         true
                     } else {
                         false
                     };
+
+                    if tokens.len() < 2 && is_label {
+                        eprintln!("{}: you can't point with label at nothing", "ERROR".bright_red());
+                        std::process::exit(1);
+                    }
 
                     // TODO: MAKE PRETIFY AND OPTIMISE
                     let (instr, op_data, sec_byte_str) = if is_label {
@@ -122,7 +127,7 @@ impl Compiler {
                             (tokens[1].clone(), op_data, None)
                         }
                     } else {
-                        // print!("INSTR: {}", tokens[0]);s
+                        // print!("INSTR: {}", tokens[0]);
                         let (op_data, byte) = self.dict.get_opcode(tokens[0].as_str());
                         if byte {
                             (tokens[0].clone(), op_data, Some(tokens[1].clone()))
@@ -130,8 +135,10 @@ impl Compiler {
                             (tokens[0].clone(), op_data, None)
                         }
                     };
-
-                    // println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
+                    
+                    if verbosity {
+                        println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
+                    }
 
                     let op = match op_data {
                         Some(op) => *op,
