@@ -1,5 +1,5 @@
 use colored::*;
-use crate::file::{write_file, read_file};
+use crate::file::{write_file, read_file, is_such_file};
 
 use std::cmp::Ordering;
 use std::process::Command;
@@ -38,8 +38,8 @@ impl PreProcessor {
         }
     }
 
-    pub fn preprocess(&mut self, tmp_fname: String) -> Vec<String> {
-        self.parse_macros();
+    pub fn preprocess(&mut self, tmp_fname: String, inc_dir: String) -> Vec<String> {
+        self.parse_macros(inc_dir);
         self.make_m4_rules();
 
         // Save all source code into one file to preprocess it wiht m4
@@ -71,7 +71,7 @@ impl PreProcessor {
         output.split('\n').map(|s| s.to_string()).collect()
     }
 
-    fn parse_macros(&mut self) {
+    fn parse_macros(&mut self, inc_dir: String) {
         let mut index: usize = 0;
 
         let mut is_long_macro = false;
@@ -101,6 +101,8 @@ impl PreProcessor {
             }
             
             let tokens: Vec<String> = line.split_whitespace().map(|s| s.to_string()).collect();
+
+            if tokens.is_empty() { continue; }
 
             if tokens[0].starts_with(';') { continue; }
 
@@ -141,8 +143,17 @@ impl PreProcessor {
                 }
                 index -= 1;
                 self.data.remove(index);
-                for (i, l) in read_file(format!("{}{}", self.base_path, tokens[1].clone())).iter().enumerate() {
-                    self.data.insert(index+i, (*l).clone());
+                if is_such_file(format!("{}{}", self.base_path, tokens[1].clone())) {
+                    for (i, l) in read_file(format!("{}{}", self.base_path, tokens[1].clone())).iter().enumerate() {
+                        self.data.insert(index+i, (*l).clone());
+                    }
+                } else if is_such_file(format!("{}/{}", inc_dir.clone(), tokens[1].clone())) {
+                    for (i, l) in read_file(format!("{}/{}", inc_dir, tokens[1].clone())).iter().enumerate() {
+                        self.data.insert(index+i, (*l).clone());
+                    }
+                } else {
+                    eprintln!("{}: no such file to include as `{}`", "ERROR".bright_red(), tokens[1]);
+                    std::process::exit(1);
                 }
             } else if is_long_macro && !tokens[0].starts_with('.') {
                 if first_macro_line {

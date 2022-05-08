@@ -50,3 +50,7 @@ pub fn write_file_bin(filename: String, data: Vec<u8>) {
     };
     file.write_all(&data);
 }
+
+pub fn is_such_file(filename: String) -> bool {
+    std::path::Path::new(filename.as_str()).exists()
+}

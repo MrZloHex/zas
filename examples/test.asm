@@ -10,7 +10,7 @@ END
 SECTION TEXT
 
 _start:		INIT_STACK
-		LEA(num_A+3-2)
+		LEA(num_A)
 		MMA
 		LEA(num_B)
 		MMB
@@ -30,7 +30,7 @@ END
 
 SECTION DATA
 
-num_A:		0x05 0x02
+num_A:		0x02
 num_B:		0x04
 num_C:		0x08
 

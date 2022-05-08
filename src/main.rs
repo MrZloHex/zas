@@ -19,11 +19,12 @@ fn main() {
         if !base_path.is_empty() { base_path.push('/'); }
         let output_fname = matches.value_of("output").unwrap().to_string();
         let verbosity = matches.is_present("verbose");
+        let inc_dir = matches.value_of("include").unwrap_or("").to_string();
 
         if verbosity { println!("{}: Preprocessing", "INFO".cyan()) }
 
         let mut preproc = PreProcessor::new(read_file(input_fname), "macro_rules.m4".to_string(), base_path);
-        let code = preproc.preprocess("output.zas".to_string());
+        let code = preproc.preprocess("output.zas".to_string(), inc_dir);
 
         if verbosity { println!("{}: Compiling", "INFO".cyan()) }
         

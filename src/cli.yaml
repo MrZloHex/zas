@@ -28,4 +28,11 @@ subcommands:
                 help: Displaying input assembly code and ouput binary code
                 required: false
                 takes_value: false
+            - include:
+                short: -I
+                long: include
+                help: Path to include directory
+                required: false
+                takes_value: true
+                value_name: PATH
 
