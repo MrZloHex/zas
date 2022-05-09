@@ -38,7 +38,7 @@ impl PreProcessor {
         }
     }
 
-    pub fn preprocess(&mut self, tmp_fname: String, inc_dir: String) -> Vec<String> {
+    pub fn preprocess(&mut self, tmp_fname: String, inc_dir: String, verbosity: bool) -> Vec<String> {
         self.parse_macros(inc_dir);
         self.make_m4_rules();
 
@@ -61,12 +61,13 @@ impl PreProcessor {
         // println!("Preproc output:\n{}\nEND", output);
 
         // REMOVE M4 RULES FILE
-
-        let _ = Command::new("rm")
-                                .arg(self.mrfname.clone())
-                                .arg(tmp_fname)
-                                .output()
-                                .expect("Failed to delete tmp files");
+        if !verbosity {
+            let _ = Command::new("rm")
+                                    .arg(self.mrfname.clone())
+                                    .arg(tmp_fname)
+                                    .output()
+                                    .expect("Failed to delete tmp files");
+        }
                                 
         output.split('\n').map(|s| s.to_string()).collect()
     }

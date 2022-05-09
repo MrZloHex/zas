@@ -24,7 +24,7 @@ fn main() {
         if verbosity { println!("{}: Preprocessing", "INFO".cyan()) }
 
         let mut preproc = PreProcessor::new(read_file(input_fname), "macro_rules.m4".to_string(), base_path);
-        let code = preproc.preprocess("output.zas".to_string(), inc_dir);
+        let code = preproc.preprocess("output.zas".to_string(), inc_dir, verbosity);
 
         if verbosity { println!("{}: Compiling", "INFO".cyan()) }
         
