@@ -22,12 +22,6 @@ subcommands:
                 required: true
                 takes_value: true
                 value_name: OUTPUT_FILE
-            - verbose:
-                short: v
-                long: verbose
-                help: Displaying input assembly code and ouput binary code
-                required: false
-                takes_value: false
             - include:
                 short: -I
                 long: include

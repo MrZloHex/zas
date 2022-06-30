@@ -3,6 +3,7 @@ use colored::*;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 
+
 pub fn read_file(filename: String) -> Vec<String> {
     let file = match File::open(filename.clone()) {
         Ok(fl) => fl,
@@ -26,6 +27,10 @@ pub fn read_file(filename: String) -> Vec<String> {
     data
 }
 
+pub fn read_file_in_path(path: String, filename: String) -> Vec<String> {
+    read_file(format!("{}{}", path, filename))
+}
+
 pub fn write_file(filename: String, data: Vec<String>) {
     let mut file = match File::create(filename.clone()) {
         Ok(f) => f,
@@ -46,7 +51,15 @@ pub fn write_file(filename: String, data: Vec<String>) {
         }
         val.push(b'\n');
     }
-    file.write_all(&val);
+    if let Err(why) = file.write_all(&val) {
+        eprintln!(
+            "{}: couldn't create file {} cause {}",
+            "ERROR".bright_red(),
+            filename.italic().bold(),
+            why
+        );
+        std::process::exit(1);
+    }
 }
 
 pub fn write_file_bin(filename: String, data: Vec<u8>) {
@@ -62,9 +75,22 @@ pub fn write_file_bin(filename: String, data: Vec<u8>) {
             std::process::exit(1);
         }
     };
-    file.write_all(&data);
+    if let Err(why) = file.write_all(&data) {
+        eprintln!(
+            "{}: couldn't create file {} cause {}",
+            "ERROR".bright_red(),
+            filename.italic().bold(),
+            why
+        );
+        std::process::exit(1);
+    }
 }
 
 pub fn is_such_file(filename: String) -> bool {
     std::path::Path::new(filename.as_str()).exists()
+}
+
+
+pub fn is_such_file_in_path(filename: String, path: String) -> bool {
+    is_such_file(format!("{}{}", filename, path))
 }

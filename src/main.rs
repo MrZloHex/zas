@@ -37,8 +37,7 @@ fn main() {
             cli_settings.get_input_filename(),
             cli_settings.get_output_filename(),
             cli_settings.get_base_path(),
-            cli_settings.get_include_path(),
-            cli_settings.get_verbosity(),
+            cli_settings.get_include_path()
         ),
         DISASSEMBLE => unreachable!(),
         NONE        => unreachable!(),
@@ -47,7 +46,7 @@ fn main() {
     // if verbosity { bin_dump(compiler.get_binary()) }
 }
 
-fn bin_dump(data: Vec<u8>) {
+fn _bin_dump(data: Vec<u8>) {
     print!("{}: Binary output\n\t", "INFO".cyan());
     let mut line = 0;
     for byte in data {

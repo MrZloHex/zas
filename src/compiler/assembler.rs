@@ -4,11 +4,11 @@ use colored::*;
 use std::collections::HashMap;
 
 pub struct Assembler {
-    data: Vec<String>,
-    line: usize,
-    binary: Vec<u8>,
-    dict: Dictionary<'static>,
-    labels: HashMap<String, u16>,
+    data:          Vec<String>,
+    line:          usize,
+    binary:        Vec<u8>,
+    dict:          Dictionary<'static>,
+    labels:        HashMap<String, u16>,
     label_address: u16,
 }
 
@@ -16,15 +16,15 @@ impl Assembler {
     pub fn new(data: Vec<String>) -> Self {
         Assembler {
             data,
-            line: 0,
+            line:   0,
             binary: Vec::new(),
-            dict: Dictionary::new(),
+            dict:   Dictionary::new(),
             labels: HashMap::new(),
             label_address: 0,
         }
     }
 
-    pub fn assembly(&mut self, verbosity: bool) {
+    pub fn assembly(&mut self) {
         // if verbosity {  println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
 
         let mut is_sec_text = false;
@@ -141,12 +141,10 @@ impl Assembler {
                         }
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
-                            if verbosity {
-                                println!(
-                                    "GOT A LABEL `{}` at address {:X}",
-                                    tokens[0], self.label_address
-                                )
-                            }
+                            /* println!(
+                                "GOT A LABEL `{}` at address {:X}",
+                                tokens[0], self.label_address
+                            ) */
                         }
                         true
                     } else {
@@ -180,9 +178,7 @@ impl Assembler {
                         }
                     };
 
-                    if verbosity {
-                        println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
-                    }
+                    // println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
 
                     let op = match op_data {
                         Some(op) => *op,
@@ -267,9 +263,7 @@ impl Assembler {
                         tokens[0].pop();
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
-                            if verbosity {
-                                // println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
-                            }
+                            // println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
                         }
                         if tokens.len() < 2 {
                             eprintln!(
@@ -294,9 +288,7 @@ impl Assembler {
                         tokens[0].pop();
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
-                            if verbosity {
-                                // println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
-                            }
+                            // println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
                         }
                         if tokens.len() < 2 {
                             eprintln!(

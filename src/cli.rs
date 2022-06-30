@@ -1,6 +1,7 @@
 use clap::{load_yaml, App};
 
 #[derive(Copy, Clone)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum CmdType {
     BUILD,
     DISASSEMBLE,
@@ -23,7 +24,6 @@ pub struct CliSet {
     output_filename: String,
     base_path:       Option<String>,
     include_path:    Option<String>,
-    verbosity:       bool,
 }
 
 impl CliSet {
@@ -34,7 +34,6 @@ impl CliSet {
             output_filename: String::new(),
             base_path:       None,
             include_path:    None,
-            verbosity:       false,
         }
     }
 
@@ -72,10 +71,12 @@ impl CliSet {
                 None
             };
 
-            cliset.verbosity = matches.is_present("verbose");
-
             // get include path and convert to String type
-            cliset.include_path = matches.value_of("include").map(|i| i.to_string());
+            cliset.include_path = {
+                let mut inc_path = matches.value_of("include").map(|i| i.to_string()).unwrap();
+                inc_path.push('/');
+                Some(inc_path)
+            };
         } else if let Some(_matches) = matches.subcommand_matches("disassemble") {
             cliset.type_of_proc = CmdType::DISASSEMBLE;
             todo!("IN PROGRESS");
@@ -105,8 +106,5 @@ impl CliSet {
     pub fn get_include_path(&self) -> Option<String> {
         self.include_path.clone()
     }
-
-    pub fn get_verbosity(&self) -> bool {
-        self.verbosity
-    }
 }
+
