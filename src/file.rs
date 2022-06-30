@@ -1,13 +1,18 @@
 use colored::*;
 
-use std::io::{BufReader, BufRead, Write};
 use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
 
 pub fn read_file(filename: String) -> Vec<String> {
     let file = match File::open(filename.clone()) {
         Ok(fl) => fl,
         Err(why) => {
-            eprintln!("{}: couldn't open {} cause {}", "ERROR".bright_red(), filename.italic().bold(), why);
+            eprintln!(
+                "{}: couldn't open {} cause {}",
+                "ERROR".bright_red(),
+                filename.italic().bold(),
+                why
+            );
             std::process::exit(1);
         }
     };
@@ -25,7 +30,12 @@ pub fn write_file(filename: String, data: Vec<String>) {
     let mut file = match File::create(filename.clone()) {
         Ok(f) => f,
         Err(why) => {
-            eprintln!("{}: couldn't create file {} cause {}", "ERROR".bright_red(), filename.italic().bold(), why);
+            eprintln!(
+                "{}: couldn't create file {} cause {}",
+                "ERROR".bright_red(),
+                filename.italic().bold(),
+                why
+            );
             std::process::exit(1);
         }
     };
@@ -39,12 +49,16 @@ pub fn write_file(filename: String, data: Vec<String>) {
     file.write_all(&val);
 }
 
-
 pub fn write_file_bin(filename: String, data: Vec<u8>) {
     let mut file = match File::create(filename.clone()) {
         Ok(f) => f,
         Err(why) => {
-            eprintln!("{}: couldn't create file {} cause {}", "ERROR".bright_red(), filename.italic().bold(), why);
+            eprintln!(
+                "{}: couldn't create file {} cause {}",
+                "ERROR".bright_red(),
+                filename.italic().bold(),
+                why
+            );
             std::process::exit(1);
         }
     };

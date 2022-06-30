@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 pub struct Dictionary<'a> {
-    opcodes: HashMap<&'a str, u8>
+    opcodes: HashMap<&'a str, u8>,
 }
 
 impl Dictionary<'_> {
     pub fn new() -> Dictionary<'static> {
         let mut opcodes = HashMap::<&str, u8>::new();
-        
+
         opcodes.insert("HLT", 0xFF);
         opcodes.insert("LSP", 0x3F);
         opcodes.insert("JMP", 0x24);
@@ -152,7 +152,7 @@ impl Dictionary<'_> {
         opcodes.insert("ANE", 0xE0);
         opcodes.insert("ANH", 0xE8);
         opcodes.insert("ANL", 0xF0);
-        
+
         opcodes.insert("ORA", 0xC1);
         opcodes.insert("ORB", 0xC9);
         opcodes.insert("ORC", 0xD1);
@@ -177,9 +177,7 @@ impl Dictionary<'_> {
         opcodes.insert("NTH", 0xEB);
         opcodes.insert("NTL", 0xF3);
 
-        Dictionary {
-            opcodes
-        }
+        Dictionary { opcodes }
     }
 
     pub fn get_opcode(&self, string: &str) -> (Option<&u8>, bool) {

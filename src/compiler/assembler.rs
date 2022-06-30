@@ -1,32 +1,32 @@
-use crate::dictionary::Dictionary;
+use super::dictionary::Dictionary;
 use colored::*;
 
 use std::collections::HashMap;
 
-pub struct Compiler {
+pub struct Assembler {
     data: Vec<String>,
     line: usize,
     binary: Vec<u8>,
     dict: Dictionary<'static>,
     labels: HashMap<String, u16>,
-    label_address: u16
+    label_address: u16,
 }
 
-impl Compiler {
-    pub fn new(data: Vec<String>) -> Compiler {
-        Compiler {
+impl Assembler {
+    pub fn new(data: Vec<String>) -> Self {
+        Assembler {
             data,
             line: 0,
             binary: Vec::new(),
             dict: Dictionary::new(),
             labels: HashMap::new(),
-            label_address: 0
+            label_address: 0,
         }
     }
 
-    pub fn compile(&mut self, verbosity: bool) {
+    pub fn assembly(&mut self, verbosity: bool) {
         // if verbosity {  println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
-    
+
         let mut is_sec_text = false;
         let mut is_sec_data = false;
         let mut is_sec_bss = false;
@@ -38,19 +38,30 @@ impl Compiler {
                 let mut line = self.data[self.line].clone();
                 self.line += 1;
 
-                if line.is_empty() { continue; }
+                if line.is_empty() {
+                    continue;
+                }
 
                 line = line.replace("\t", " ");
-                let mut tokens: Vec<String> = line.split_whitespace().map(|s| s.to_string()).collect();
+                let mut tokens: Vec<String> =
+                    line.split_whitespace().map(|s| s.to_string()).collect();
 
                 // EMPTY
-                if tokens.is_empty() { continue; }
-                if tokens[0].starts_with(';') || tokens[0].starts_with('.') { continue; }
+                if tokens.is_empty() {
+                    continue;
+                }
+                if tokens[0].starts_with(';') || tokens[0].starts_with('.') {
+                    continue;
+                }
 
                 // Defining code sections
                 if tokens[0] == "SECTION" {
                     if tokens.len() < 2 {
-                        eprintln!("{}: undefined section at line {}", "ERROR".bright_red(), self.line);
+                        eprintln!(
+                            "{}: undefined section at line {}",
+                            "ERROR".bright_red(),
+                            self.line
+                        );
                         std::process::exit(1);
                     }
 
@@ -59,31 +70,52 @@ impl Compiler {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_text = true;
                         } else {
-                            eprintln!("{}: cannot be defined section in another at line {}", "ERROR".bright_red(), self.line);
+                            eprintln!(
+                                "{}: cannot be defined section in another at line {}",
+                                "ERROR".bright_red(),
+                                self.line
+                            );
                             std::process::exit(1);
                         }
                     } else if tokens[1] == "BSS" {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_bss = true;
                         } else {
-                            eprintln!("{}: cannot be defined section in another at line {}", "ERROR".bright_red(), self.line);
-                            std::process::exit(1); 
+                            eprintln!(
+                                "{}: cannot be defined section in another at line {}",
+                                "ERROR".bright_red(),
+                                self.line
+                            );
+                            std::process::exit(1);
                         }
                     } else if tokens[1] == "DATA" {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_data = true;
                         } else {
-                            eprintln!("{}: cannot be defined section in another at line {}", "ERROR".bright_red(), self.line);
+                            eprintln!(
+                                "{}: cannot be defined section in another at line {}",
+                                "ERROR".bright_red(),
+                                self.line
+                            );
                             std::process::exit(1);
                         }
                     } else {
-                        eprintln!("{}: unknown section {} at line {}", "ERROR".bright_red(), tokens[1].italic(), self.line);
+                        eprintln!(
+                            "{}: unknown section {} at line {}",
+                            "ERROR".bright_red(),
+                            tokens[1].italic(),
+                            self.line
+                        );
                         std::process::exit(1);
                     }
                     continue;
                 } else if tokens[0] == "END" {
                     if !is_sec_bss && !is_sec_data && !is_sec_text {
-                        eprintln!("{}: ending section without declaring it at line {}", "ERROR".bright_red(), self.line);
+                        eprintln!(
+                            "{}: ending section without declaring it at line {}",
+                            "ERROR".bright_red(),
+                            self.line
+                        );
                         std::process::exit(1);
                     } else {
                         is_sec_bss = false;
@@ -92,19 +124,28 @@ impl Compiler {
                     }
                     continue;
                 }
-                
+
                 if is_sec_text {
                     let is_label = if tokens[0].ends_with(':') {
                         tokens[0].pop();
                         let first_char = tokens[0].chars().next().unwrap();
                         if first_char.is_numeric() || first_char == '.' {
-                            eprintln!("{}: labels can't starts with {} or {} - `{}`", "ERROR".bright_red(), "NUMBER".bold(), "DOT".bold(), tokens[0]);
+                            eprintln!(
+                                "{}: labels can't starts with {} or {} - `{}`",
+                                "ERROR".bright_red(),
+                                "NUMBER".bold(),
+                                "DOT".bold(),
+                                tokens[0]
+                            );
                             std::process::exit(1);
                         }
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
                             if verbosity {
-                                println!("GOT A LABEL `{}` at address {:X}", tokens[0], self.label_address)
+                                println!(
+                                    "GOT A LABEL `{}` at address {:X}",
+                                    tokens[0], self.label_address
+                                )
                             }
                         }
                         true
@@ -113,7 +154,10 @@ impl Compiler {
                     };
 
                     if tokens.len() < 2 && is_label {
-                        eprintln!("{}: you can't point with label at nothing", "ERROR".bright_red());
+                        eprintln!(
+                            "{}: you can't point with label at nothing",
+                            "ERROR".bright_red()
+                        );
                         std::process::exit(1);
                     }
 
@@ -135,7 +179,7 @@ impl Compiler {
                             (tokens[0].clone(), op_data, None)
                         }
                     };
-                    
+
                     if verbosity {
                         println!(" OP {:?} IMM {:?}", op_data, sec_byte_str);
                     }
@@ -143,7 +187,12 @@ impl Compiler {
                     let op = match op_data {
                         Some(op) => *op,
                         None => {
-                            eprintln!("{}: no such instruction {} at line {}", "ERROR".bright_red(), instr.bold(), self.line);
+                            eprintln!(
+                                "{}: no such instruction {} at line {}",
+                                "ERROR".bright_red(),
+                                instr.bold(),
+                                self.line
+                            );
                             std::process::exit(1);
                         }
                     };
@@ -159,12 +208,19 @@ impl Compiler {
                                 indetify_number(imm_str)
                             } else if cycle != 0 {
                                 if imm_str.contains('%') {
-                                    let label_toks: Vec<String> = imm_str.split('%').map(|s| s.to_string()).collect();
+                                    let label_toks: Vec<String> =
+                                        imm_str.split('%').map(|s| s.to_string()).collect();
                                     if label_toks[1].is_empty() {
-                                        eprintln!("{}: not specifed SIGNIFICANCE of address at line {}", "ERROR".bright_red(), self.line);
+                                        eprintln!(
+                                            "{}: not specifed SIGNIFICANCE of address at line {}",
+                                            "ERROR".bright_red(),
+                                            self.line
+                                        );
                                         std::process::exit(1);
                                     }
-                                    let address = if label_toks[0].contains('+') || label_toks[0].contains('-') {
+                                    let address = if label_toks[0].contains('+')
+                                        || label_toks[0].contains('-')
+                                    {
                                         self.eval_address(label_toks[0].clone())
                                     } else {
                                         self.get_address(&label_toks[0])
@@ -174,7 +230,11 @@ impl Compiler {
                                         "H" => (address >> 8) as u8,
                                         "L" => address as u8,
                                         _ => {
-                                            eprintln!("{}: undefined SIGNIFICANCE of address at line {}", "ERROR".bright_red(), self.line);
+                                            eprintln!(
+                                                "{}: undefined SIGNIFICANCE of address at line {}",
+                                                "ERROR".bright_red(),
+                                                self.line
+                                            );
                                             std::process::exit(1);
                                         }
                                     };
@@ -193,7 +253,7 @@ impl Compiler {
                             } else {
                                 self.binary.push(imm);
                             }
-                        },
+                        }
                         None => {
                             if cycle == 0 {
                                 self.label_address += 1;
@@ -212,7 +272,11 @@ impl Compiler {
                             }
                         }
                         if tokens.len() < 2 {
-                            eprintln!("{}: value of data wasn't provide at line {}", "ERROR".bright_red(), self.line);
+                            eprintln!(
+                                "{}: value of data wasn't provide at line {}",
+                                "ERROR".bright_red(),
+                                self.line
+                            );
                             std::process::exit(1);
                         }
                         for i in tokens.iter().skip(1) {
@@ -235,7 +299,11 @@ impl Compiler {
                             }
                         }
                         if tokens.len() < 2 {
-                            eprintln!("{}: quantity of bytes wasn't provide at line {}", "ERROR".bright_red(), self.line);
+                            eprintln!(
+                                "{}: quantity of bytes wasn't provide at line {}",
+                                "ERROR".bright_red(),
+                                self.line
+                            );
                             std::process::exit(1);
                         }
                         let resb = indetify_number(tokens[1].clone());
@@ -259,7 +327,12 @@ impl Compiler {
         match self.labels.get(label) {
             Some(&add) => add,
             None => {
-                eprintln!("{}: no such label {} at line {}", "ERROR".bright_red(), label.bold(), self.line);
+                eprintln!(
+                    "{}: no such label {} at line {}",
+                    "ERROR".bright_red(),
+                    label.bold(),
+                    self.line
+                );
                 std::process::exit(1);
             }
         }
@@ -295,7 +368,7 @@ impl Compiler {
             } else {
                 self.get_address(&(terms.0.to_string()))
             };
-        
+
             if add {
                 address += val;
             } else {
@@ -335,14 +408,19 @@ fn indetify_number(imm_str: String) -> u8 {
     } else {
         let dec_val = match imm_str.strip_prefix("0d") {
             Some(val) => val,
-            None => imm_str.as_str()
+            None => imm_str.as_str(),
         };
         (10, dec_val, "DEC".to_string())
     };
     let imm: u8 = match u8::from_str_radix(val_str, radix) {
         Ok(val) => val,
         Err(_) => {
-            eprintln!("{}: incorrect immediate {} value {}", "ERROR".bright_red(), error_str, imm_str.bold());
+            eprintln!(
+                "{}: incorrect immediate {} value {}",
+                "ERROR".bright_red(),
+                error_str,
+                imm_str.bold()
+            );
             std::process::exit(1);
         }
     };
