@@ -7,7 +7,7 @@ SECTION TEXT
 		MIA str%H
 		MIB str%L
 
-hex4:	PUC
+qwe:		PUC
 		PUD
 		PUE
 		MAH
@@ -33,7 +33,7 @@ _h1:		MAH
 		MBL
 		POA
 
-		MID 0x30
+		MID 0x29 + 1
 		CPD
 		LEA(_exit)
 		JSC

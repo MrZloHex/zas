@@ -72,11 +72,13 @@ impl CliSet {
             };
 
             // get include path and convert to String type
-            cliset.include_path = {
-                let mut inc_path = matches.value_of("include").map(|i| i.to_string()).unwrap();
-                inc_path.push('/');
-                Some(inc_path)
-            };
+            if matches.is_present("include") {
+                cliset.include_path = {
+                    let mut inc_path = matches.value_of("include").map(|i| i.to_string()).unwrap();
+                    inc_path.push('/');
+                    Some(inc_path)
+                };
+            }
         } else if let Some(_matches) = matches.subcommand_matches("disassemble") {
             cliset.type_of_proc = CmdType::DISASSEMBLE;
             todo!("IN PROGRESS");

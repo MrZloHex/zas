@@ -3,6 +3,8 @@ use colored::*;
 
 use std::collections::HashMap;
 
+use super::build::in_error;
+
 pub struct Assembler {
     data:          Vec<String>,
     line:          usize,
@@ -25,11 +27,9 @@ impl Assembler {
     }
 
     pub fn assembly(&mut self) {
-        // if verbosity {  println!("{}:\t{}\t{}\t{}", "INFO".cyan(), "INSTR".bright_white().bold(), "OPCODE".bright_white().bold(), "IMM".bright_white().bold()) }
-
         let mut is_sec_text = false;
         let mut is_sec_data = false;
-        let mut is_sec_bss = false;
+        let mut is_sec_bss  = false;
 
         // 1st cycle - parsing all offsets and labels
         // 2nd cycle - actual compliling
@@ -46,23 +46,15 @@ impl Assembler {
                 let mut tokens: Vec<String> =
                     line.split_whitespace().map(|s| s.to_string()).collect();
 
-                // EMPTY
-                if tokens.is_empty() {
-                    continue;
-                }
-                if tokens[0].starts_with(';') || tokens[0].starts_with('.') {
+                // Skip emptry lines, comments, and preprocessor operators
+                if tokens.is_empty() ||  tokens[0].starts_with(';') || tokens[0].starts_with('.') {
                     continue;
                 }
 
                 // Defining code sections
                 if tokens[0] == "SECTION" {
                     if tokens.len() < 2 {
-                        eprintln!(
-                            "{}: undefined section at line {}",
-                            "ERROR".bright_red(),
-                            self.line
-                        );
-                        std::process::exit(1);
+                        in_error("undefined section");
                     }
 
                     // TODO: Somehow opitimise and refoactor this
@@ -70,53 +62,39 @@ impl Assembler {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_text = true;
                         } else {
-                            eprintln!(
-                                "{}: cannot be defined section in another at line {}",
-                                "ERROR".bright_red(),
-                                self.line
-                            );
-                            std::process::exit(1);
+                            in_error(format!(
+                                "cannot be defined section {} in another",
+                                tokens[1].bold()
+                            ));
                         }
                     } else if tokens[1] == "BSS" {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_bss = true;
                         } else {
-                            eprintln!(
-                                "{}: cannot be defined section in another at line {}",
-                                "ERROR".bright_red(),
-                                self.line
-                            );
-                            std::process::exit(1);
+                            in_error(format!(
+                                "cannot be defined section {} in another",
+                                tokens[1].bold()
+                            ));
                         }
                     } else if tokens[1] == "DATA" {
                         if !is_sec_bss && !is_sec_data && !is_sec_text {
                             is_sec_data = true;
                         } else {
-                            eprintln!(
-                                "{}: cannot be defined section in another at line {}",
-                                "ERROR".bright_red(),
-                                self.line
-                            );
-                            std::process::exit(1);
+                            in_error(format!(
+                                "cannot be defined section {} in another",
+                                tokens[1].bold()
+                            ));
                         }
                     } else {
-                        eprintln!(
-                            "{}: unknown section {} at line {}",
-                            "ERROR".bright_red(),
+                        in_error(format!(
+                            "unknown section {}",
                             tokens[1].italic(),
-                            self.line
-                        );
-                        std::process::exit(1);
+                        ));
                     }
                     continue;
                 } else if tokens[0] == "END" {
                     if !is_sec_bss && !is_sec_data && !is_sec_text {
-                        eprintln!(
-                            "{}: ending section without declaring it at line {}",
-                            "ERROR".bright_red(),
-                            self.line
-                        );
-                        std::process::exit(1);
+                        in_error("ending section without declaring it");
                     } else {
                         is_sec_bss = false;
                         is_sec_data = false;
@@ -128,16 +106,17 @@ impl Assembler {
                 if is_sec_text {
                     let is_label = if tokens[0].ends_with(':') {
                         tokens[0].pop();
+                        if tokens[0].is_empty() {
+                            in_error("not specifed label just colon");
+                        }
                         let first_char = tokens[0].chars().next().unwrap();
                         if first_char.is_numeric() || first_char == '.' {
-                            eprintln!(
-                                "{}: labels can't starts with {} or {} - `{}`",
-                                "ERROR".bright_red(),
+                            in_error(format!(
+                                "labels can't starts with {} or {} - `{}`",
                                 "NUMBER".bold(),
                                 "DOT".bold(),
                                 tokens[0]
-                            );
-                            std::process::exit(1);
+                            ));
                         }
                         if cycle == 0 {
                             self.labels.insert(tokens[0].clone(), self.label_address);
@@ -152,11 +131,7 @@ impl Assembler {
                     };
 
                     if tokens.len() < 2 && is_label {
-                        eprintln!(
-                            "{}: you can't point with label at nothing",
-                            "ERROR".bright_red()
-                        );
-                        std::process::exit(1);
+                        in_error("you can't point with label at nothing");
                     }
 
                     // TODO: MAKE PRETIFY AND OPTIMISE
@@ -164,6 +139,12 @@ impl Assembler {
                         // print!("INSTR: {}", tokens[1]);
                         let (op_data, byte) = self.dict.get_opcode(tokens[1].as_str());
                         if byte {
+                            if tokens.len() < 3 {
+                                in_error(format!(
+                                        "immediate value required for instruction `{}`",
+                                        tokens[1]
+                                ));
+                            }
                             (tokens[1].clone(), op_data, Some(tokens[2].clone()))
                         } else {
                             (tokens[1].clone(), op_data, None)
@@ -172,6 +153,12 @@ impl Assembler {
                         // print!("INSTR: {}", tokens[0]);
                         let (op_data, byte) = self.dict.get_opcode(tokens[0].as_str());
                         if byte {
+                            if tokens.len() < 2 {
+                                in_error(format!(
+                                        "immediate value required for instruction `{}`",
+                                        tokens[0]
+                                ));
+                            }
                             (tokens[0].clone(), op_data, Some(tokens[1].clone()))
                         } else {
                             (tokens[0].clone(), op_data, None)
@@ -183,13 +170,10 @@ impl Assembler {
                     let op = match op_data {
                         Some(op) => *op,
                         None => {
-                            eprintln!(
-                                "{}: no such instruction {} at line {}",
-                                "ERROR".bright_red(),
+                            in_error(format!(
+                                "no such instruction {}",
                                 instr.bold(),
-                                self.line
-                            );
-                            std::process::exit(1);
+                            ));
                         }
                     };
 
@@ -207,12 +191,9 @@ impl Assembler {
                                     let label_toks: Vec<String> =
                                         imm_str.split('%').map(|s| s.to_string()).collect();
                                     if label_toks[1].is_empty() {
-                                        eprintln!(
-                                            "{}: not specifed SIGNIFICANCE of address at line {}",
-                                            "ERROR".bright_red(),
-                                            self.line
+                                        in_error(
+                                            "not specifed SIGNIFICANCE of address"
                                         );
-                                        std::process::exit(1);
                                     }
                                     let address = if label_toks[0].contains('+')
                                         || label_toks[0].contains('-')
@@ -226,20 +207,14 @@ impl Assembler {
                                         "H" => (address >> 8) as u8,
                                         "L" => address as u8,
                                         _ => {
-                                            eprintln!(
-                                                "{}: undefined SIGNIFICANCE of address at line {}",
-                                                "ERROR".bright_red(),
-                                                self.line
+                                            in_error(
+                                                "undefined SIGNIFICANCE of address"
                                             );
-                                            std::process::exit(1);
                                         }
                                     };
                                     imm
                                 } else {
-                                    // FOR FUTURE for simple LABELS and maybe SOME DATA
-                                    // TODO: normal error message - formatted
-                                    eprintln!("ERROR: not specifed SIGNIFICANCE of address");
-                                    std::process::exit(1);
+                                    in_error("not specifed SIGNIFICANCE of address");
                                 }
                             } else {
                                 0
@@ -266,12 +241,9 @@ impl Assembler {
                             // println!("GOT A DATA `{}` at address {:X}", tokens[0], self.label_address)
                         }
                         if tokens.len() < 2 {
-                            eprintln!(
-                                "{}: value of data wasn't provide at line {}",
-                                "ERROR".bright_red(),
-                                self.line
+                            in_error(
+                                "value of data wasn't provide"
                             );
-                            std::process::exit(1);
                         }
                         for i in tokens.iter().skip(1) {
                             if cycle == 1 {
@@ -280,8 +252,7 @@ impl Assembler {
                             self.label_address += 1;
                         }
                     } else {
-                        eprintln!("{}: data section is only for labels", "ERROR".bright_red());
-                        std::process::exit(69);
+                        in_error("data section is only for labels");
                     }
                 } else if is_sec_bss {
                     if tokens[0].ends_with(':') {
@@ -291,12 +262,9 @@ impl Assembler {
                             // println!("GOT A BSS `{}` at address {:X}", tokens[0], self.label_address)
                         }
                         if tokens.len() < 2 {
-                            eprintln!(
-                                "{}: quantity of bytes wasn't provide at line {}",
-                                "ERROR".bright_red(),
-                                self.line
+                            in_error(
+                                "quantity of bytes wasn't provide",
                             );
-                            std::process::exit(1);
                         }
                         let resb = indetify_number(tokens[1].clone());
                         for _ in 0..resb {
@@ -306,8 +274,7 @@ impl Assembler {
                             self.label_address += 1;
                         }
                     } else {
-                        eprintln!("{}: data section is only for labels", "ERROR".bright_red());
-                        std::process::exit(69);
+                        in_error("data section is only for labels");
                     }
                 }
             }
@@ -319,18 +286,17 @@ impl Assembler {
         match self.labels.get(label) {
             Some(&add) => add,
             None => {
-                eprintln!(
-                    "{}: no such label {} at line {}",
-                    "ERROR".bright_red(),
+                in_error(format!(
+                    "no such label {}",
                     label.bold(),
-                    self.line
-                );
-                std::process::exit(1);
+                ));
             }
         }
     }
 
     fn eval_address(&self, cl: String) -> u16 {
+        // TODO: refactor with function and do correct error handling
+
         let mut complex_label = cl;
         let mut add = true;
         let mut address: u16 = 0;
@@ -407,13 +373,11 @@ fn indetify_number(imm_str: String) -> u8 {
     let imm: u8 = match u8::from_str_radix(val_str, radix) {
         Ok(val) => val,
         Err(_) => {
-            eprintln!(
-                "{}: incorrect immediate {} value {}",
-                "ERROR".bright_red(),
+            in_error(format!(
+                "incorrect immediate {} value {}",
                 error_str,
                 imm_str.bold()
-            );
-            std::process::exit(1);
+            ));
         }
     };
     imm

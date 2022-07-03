@@ -4,6 +4,8 @@ use colored::*;
 use std::cmp::Ordering;
 use std::process::Command;
 
+use super::build::in_error;
+
 #[derive(Debug, Clone)]
 struct Macro {
     pub name:  String,
@@ -60,16 +62,16 @@ impl PreProcessor {
             .output() 
         {
             Ok(out) => out,
-            Err(err) => Self::in_error(format!("failed to run M4 preprocess, because {:?}", err))
+            Err(err) => in_error(format!("failed to run M4 preprocess, because {:?}", err))
         };
 
         if !preproc.status.success() {
-            Self::in_error("failed to preprocess with M4");
+            in_error("failed to preprocess with M4");
         }
 
         let output = match String::from_utf8(preproc.stdout) {
             Ok(out) => out,
-            Err(err) => Self::in_error(format!("filed to parse output of M4 preprocess: `{:?}`", err.utf8_error()))
+            Err(err) => in_error(format!("filed to parse output of M4 preprocess: `{:?}`", err.utf8_error()))
         };
 
         // REMOVE M4 RULES FILE
@@ -78,7 +80,7 @@ impl PreProcessor {
             .arg(tmp_fname)
             .output()
         {
-            Self::in_error(format!("Failed to delete tmp files, because {:?}", err));
+            in_error(format!("Failed to delete tmp files, because {:?}", err));
         };
 
         // Return vec of lines of preprocessed source code
@@ -138,7 +140,7 @@ impl PreProcessor {
                 ".DEFINE" => {
                     // Check for NAME of macro
                     if tokens.len() < 2 || tokens[1].is_empty() {
-                        Self::in_error("not defined macro name");
+                        in_error("not defined macro name");
                     }
                     self.macro_rules
                         .push(Macro::make(tokens[1].clone(), String::new()));
@@ -152,7 +154,7 @@ impl PreProcessor {
                         Ordering::Greater => {
                             // check for NOT NULL macro value
                             if tokens[2].is_empty() {
-                                Self::in_error(
+                                in_error(
                                     format!(
                                         "value of macro {} is {}",
                                         tokens[1].italic(),
@@ -168,7 +170,7 @@ impl PreProcessor {
                             long_macro.name = tokens[1].clone();
                         }
                         _ => {
-                            Self::in_error("not defined macro name")
+                            in_error("not defined macro name")
                         }
                     }
                 },
@@ -183,7 +185,7 @@ impl PreProcessor {
                 },
                 ".INCLUDE" => {
                     if tokens.len() < 2 {
-                        Self::in_error("filepath to include doesn't provided");
+                        in_error("filepath to include doesn't provided");
                     }
                     index -= 1;
 
@@ -205,7 +207,7 @@ impl PreProcessor {
                         }
                     } else {
                         println!("`{}{}`\n`{}{}`", self.base_path, tokens[1].clone(), inc_dir, tokens[1].clone());
-                        Self::in_error(format!(
+                        in_error(format!(
                             "no such file to include as `{}`",
                             tokens[1]
                         ));
@@ -225,7 +227,7 @@ impl PreProcessor {
                         long_macro.value.push_str(line.as_str());
                         long_macro.value.push('\n');
                     } else {
-                        Self::in_error(format!(
+                        in_error(format!(
                             "unknown preprocessor derictive: {}",
                             tokens[0].italic()
                         ));
@@ -246,12 +248,4 @@ impl PreProcessor {
         write_file(self.mrfname.clone(), m4);
     }
 
-    fn in_error<T: std::fmt::Display>(err: T) -> ! {
-        eprintln!(
-            "{}: {}",
-            "ERROR".bright_red(),
-            err
-        );
-        std::process::exit(1)
-    }
 }   
