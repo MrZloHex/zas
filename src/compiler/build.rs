@@ -23,12 +23,3 @@ pub fn build(
 }
 
 
-pub fn in_error<T: std::fmt::Display>(err: T) -> ! {
-    use colored::*;
-    eprintln!(
-        "{}: {}",
-        "ERROR".bright_red(),
-        err
-    );
-    std::process::exit(1)
-}

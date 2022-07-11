@@ -3,7 +3,7 @@ use colored::*;
 
 use std::collections::HashMap;
 
-use super::build::in_error;
+use crate::in_error;
 
 pub struct Assembler {
     data:          Vec<String>,

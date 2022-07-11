@@ -1,11 +1,11 @@
 name: ZAS
-version: "0.2.3"
+version: "0.4.3"
 author: MrZloHex <zlo.alex.it@gmail.com>
 about: Compiler of Assembler of ZPU80
 subcommands:
     - build:
         about: Produce binary file ready for uploading into ROM or into emulator
-        version: "0.2"
+        version: "0.3"
         author: MrZloHex <zlo.alex.it@gmail.com>
         args:
             - input:
@@ -23,10 +23,22 @@ subcommands:
                 takes_value: true
                 value_name: OUTPUT_FILE
             - include:
-                short: -I
+                short: I
                 long: include
                 help: Path to include directory
                 required: false
+                takes_value: true
+                value_name: PATH
+    - disassemble:
+        about: Dissasemble binary file to assembly code
+        version: "0.1"
+        author: MrZloHex <zlo.alex.it@gmail.com>
+        args:
+            - binary:
+                short: b
+                long: binary
+                help: Binary filename
+                required: true
                 takes_value: true
                 value_name: PATH
 

@@ -4,7 +4,7 @@ use colored::*;
 use std::cmp::Ordering;
 use std::process::Command;
 
-use super::build::in_error;
+use crate::in_error;
 
 #[derive(Debug, Clone)]
 struct Macro {

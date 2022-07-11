@@ -6,6 +6,9 @@ use file::{read_file, write_file_bin};
 mod compiler;
 use compiler::build;
 
+mod decompiler;
+use decompiler::disassembly;
+
 mod cli;
 use cli::CliSet;
 
@@ -39,7 +42,7 @@ fn main() {
             cli_settings.get_base_path(),
             cli_settings.get_include_path()
         ),
-        DISASSEMBLE => unreachable!(),
+        DISASSEMBLE => disassembly(cli_settings.get_input_filename()),
         NONE        => unreachable!(),
     }
 
@@ -58,4 +61,15 @@ fn _bin_dump(data: Vec<u8>) {
         }
     }
     println!()
+}
+
+
+pub fn in_error<T: std::fmt::Display>(err: T) -> ! {
+    use colored::*;
+    eprintln!(
+        "{}: {}",
+        "ERROR".bright_red(),
+        err
+    );
+    std::process::exit(1)
 }

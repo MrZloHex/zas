@@ -1,8 +1,9 @@
 use colored::*;
 
-use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
+use std::fs::{File, metadata};
+use std::io::{BufRead, BufReader, Read, Write};
 
+use super::in_error;
 
 pub fn read_file(filename: String) -> Vec<String> {
     let file = match File::open(filename.clone()) {
@@ -60,6 +61,35 @@ pub fn write_file(filename: String, data: Vec<String>) {
         );
         std::process::exit(1);
     }
+}
+
+pub fn read_file_bin(filename: String) -> Vec<u8> {
+    let mut f = match File::open(&filename) {
+        Ok(f)  => f,
+        Err(e) => in_error(format!(
+            "failed to open file {} because {}",
+            filename.bold().italic(),
+            e
+        ))
+    };
+
+    let metadata = match metadata(&filename) {
+        Ok(m)  => m,
+        Err(e) => in_error(format!(
+            "failed to read metadata on file {} beacuase {}" ,
+            filename.bold().italic(),
+            e
+        ))
+    };
+    let mut buffer: Vec<u8> = vec![0; metadata.len() as usize];
+    if let Err(e) = f.read_exact(&mut buffer) {
+        in_error(format!(
+            "failed to read file {}, probably buffer overflow -> `{}`",
+            filename,
+            e
+        ));
+    }
+    buffer
 }
 
 pub fn write_file_bin(filename: String, data: Vec<u8>) {

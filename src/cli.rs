@@ -40,7 +40,7 @@ impl CliSet {
     pub fn get_cli_settings() -> CliSet_Result {
         use CliSet_Error::*;
 
-        let mut cliset = CliSet::new();
+        let mut cliset = Self::new();
 
         // catch all setting from stack
         let yaml = load_yaml!("cli.yaml");
@@ -79,9 +79,14 @@ impl CliSet {
                     Some(inc_path)
                 };
             }
-        } else if let Some(_matches) = matches.subcommand_matches("disassemble") {
+        } else if let Some(matches) = matches.subcommand_matches("disassemble") {
             cliset.type_of_proc = CmdType::DISASSEMBLE;
-            todo!("IN PROGRESS");
+
+            cliset.input_filename = if let Some(in_fn) = matches.value_of("binary") {
+                in_fn.to_string()
+            } else {
+                return Err(NO_INPUT_FILE);
+            };
         } else {
             return Err(NO_SUCH_CMD);
         };
